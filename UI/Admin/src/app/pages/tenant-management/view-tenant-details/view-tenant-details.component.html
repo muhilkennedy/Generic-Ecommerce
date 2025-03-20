@@ -1,0 +1,85 @@
+<ngx-spinner />
+<p-fluid>
+  <!-- TODO: impl tenant details update -->
+  <p-inputGroup class="bottom-margin">
+    <p-floatLabel variant="in">
+      <input id="contact" type="text" pInputText [(ngModel)]="tenant.tenantDetail.contact"/>
+      <label for="contact">{{'Contact' | translate}}</label>
+      <p-inputgroup-addon>
+        <p-button icon="pi pi-save" variant="text" (click)="saveContact()" [label]="'Update' | translate" />
+      </p-inputgroup-addon>
+    </p-floatLabel>
+  </p-inputGroup>
+  <p-inputGroup class="bottom-margin">
+    <p-floatLabel variant="in">
+      <input id="email" type="text" pInputText [(ngModel)]="tenant.tenantDetail.emailid"/>
+      <label for="email">{{'EmailId' | translate}}</label>
+      <p-inputgroup-addon>
+        <p-button icon="pi pi-save" variant="text" (click)="saveContact()" [label]="'Update' | translate" />
+      </p-inputgroup-addon>
+    </p-floatLabel>
+  </p-inputGroup>
+  <p-inputGroup class="bottom-margin">
+    <p-floatLabel variant="in">
+      <input id="bemail" type="text" pInputText [(ngModel)]="tenant.tenantDetail.businessemail"/>
+      <label for="bemail">{{'BusinessEmailId' | translate}}</label>
+      <p-inputgroup-addon>
+        <p-button icon="pi pi-save" variant="text" (click)="saveContact()" [label]="'Update' | translate" />
+      </p-inputgroup-addon>
+    </p-floatLabel>
+  </p-inputGroup>
+  <p-inputGroup class="bottom-margin">
+    <p-floatLabel variant="in">
+      <input id="tagline" type="text" pInputText [(ngModel)]="tenant.tenantDetail.tagline"/>
+      <label for="tagline">{{'Tag Line' | translate}}</label>
+      <p-inputgroup-addon>
+        <p-button icon="pi pi-save" variant="text" (click)="saveContact()" [label]="'Update' | translate" />
+      </p-inputgroup-addon>
+    </p-floatLabel>
+  </p-inputGroup>
+  <p-inputGroup class="bottom-margin">
+    <p-floatLabel variant="in">
+      <input id="street" type="text" pInputText [(ngModel)]="tenant.tenantDetail.street"/>
+      <label for="street">{{'Street' | translate}}</label>
+      <p-inputgroup-addon>
+        <p-button icon="pi pi-save" variant="text" (click)="saveContact()" [label]="'Update' | translate" />
+      </p-inputgroup-addon>
+    </p-floatLabel>
+  </p-inputGroup>
+  <p-inputGroup class="bottom-margin">
+    <p-floatLabel variant="in">
+      <input id="city" type="text" pInputText [(ngModel)]="tenant.tenantDetail.city"/>
+      <label for="city">{{'City' | translate}}</label>
+      <p-inputgroup-addon>
+        <p-button icon="pi pi-save" variant="text" (click)="saveContact()" [label]="'Update' | translate" />
+      </p-inputgroup-addon>
+    </p-floatLabel>
+  </p-inputGroup>
+  <p-inputGroup class="bottom-margin">
+    <p-floatLabel variant="in">
+      <input id="state" type="text" pInputText [(ngModel)]="tenant.tenantDetail.state"/>
+      <label for="state">{{'State' | translate}}</label>
+      <p-inputgroup-addon>
+        <p-button icon="pi pi-save" variant="text" (click)="saveContact()" [label]="'Update' | translate" />
+      </p-inputgroup-addon>
+    </p-floatLabel>
+  </p-inputGroup>
+  <p-inputGroup class="bottom-margin">
+    <p-floatLabel variant="in">
+      <input id="pincode" type="text" pInputText [(ngModel)]="tenant.tenantDetail.pincode"/>
+      <label for="pincode">{{'Pincode' | translate}}</label>
+      <p-inputgroup-addon>
+        <p-button icon="pi pi-save" variant="text" (click)="saveContact()" [label]="'Update' | translate" />
+      </p-inputgroup-addon>
+    </p-floatLabel>
+  </p-inputGroup>
+  <p-inputGroup class="bottom-margin">
+    <p-floatLabel variant="in">
+    <input id="locale" type="text" pInputText [(ngModel)]="tenant.locale"/>
+      <label for="locale">{{'Locale' | translate}}</label>
+      <p-inputgroup-addon>
+        <p-button icon="pi pi-save" variant="text" (click)="saveLocale()" [label]="'Update' | translate" />
+      </p-inputgroup-addon>
+    </p-floatLabel>
+  </p-inputGroup>
+</p-fluid>

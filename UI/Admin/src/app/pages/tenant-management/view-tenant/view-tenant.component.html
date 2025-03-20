@@ -1,0 +1,108 @@
+<p-toast />
+<ngx-spinner/>
+<p-fluid>
+<div class="card">
+<div class="font-semibold text-xl"><b>{{'Tenants' | translate}}</b></div>
+<p-table [value]="tenants" dataKey="rootid" [tableStyle]="{ 'min-width': '60rem' }" [expandedRowKeys]="expandedRows" 
+         [rowExpandMode]="'single'" (onRowExpand)="onRowExpand($event)" (onRowCollapse)="onRowCollapse($event)"> 
+    <!-- <ng-template #caption>
+        <div class="flex flex-wrap justify-end gap-2">
+            <p-button  [raised]="true"  variant="outlined" label="Expand All" icon="pi pi-plus" text (onClick)="expandAll()" />
+            <p-button  [raised]="true"  variant="outlined" label="Collapse All" icon="pi pi-minus" text (onClick)="collapseAll()" />
+        </div>
+    </ng-template> -->
+    <ng-template #header>
+        <tr>
+            <th style="width: 5rem"></th>
+            <th>{{'Logo' | translate}}</th>
+            <th pSortableColumn="name">{{'Tenant Name' | translate}} <p-sortIcon field="name" /></th>
+            <th pSortableColumn="uniquename">{{'Unique Name' | translate}} <p-sortIcon field="uniquename" /></th>
+            <th>{{'Locale' | translate}} </th>
+            <th>{{'Details' | translate}} </th>
+            <th pSortableColumn="active">{{'Status' | translate}} <p-sortIcon field="active" /></th>
+            <th pSortableColumn="timecreated">{{'Onboarded on' | translate}}<p-sortIcon field="timecreated" /></th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-tenant let-expanded="expanded">
+        <tr>
+            <td>
+                <p-button type="button" pRipple [pRowToggler]="tenant" [text]="true" [rounded]="true" [plain]="true" 
+                          [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                          (onClick)="loadTenantSubscriptions(tenant.rootid)"/>
+            </td>
+            <td><img [src]="getTenantLogoThumbnail(tenant)" [alt]="tenant.name" width="50" class="shadow-lg" /></td>
+            <td>{{ tenant.name }}</td>
+            <td>{{ tenant.uniquename}}</td>
+            <td>{{ tenant.locale }}</td>
+            <td>
+                <p-button icon="pi pi-list" [rounded]="true" [outlined]="true" (click)="displayDialog(tenant)"/>
+                <!-- <p-dialog header="Header" [modal]="true" [(visible)]="showDialog" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+                    <p-inputGroup>
+                        <input type="text" pInputText [(ngModel)]="tenant.name" placeholder="Enter value" />
+                        <p-button 
+                          icon="pi pi-save" 
+                          (click)="saveContact()" 
+                          styleClass="p-button-success" 
+                          [label]="'Update' | translate">
+                        </p-button>
+                      </p-inputGroup>
+                </p-dialog> -->
+            </td>
+            <td>
+                <p-tag styleClass="pointer" [value]="tenant.active? 'Active' : 'Inactive'" 
+                       [severity]="tenant.active? 'success' : 'danger'" (click)="toggleTenantStatus(); tenant.active = !tenant.active" />
+                <!-- <p-togglebutton [(ngModel)]="tenant.active" onLabel="Locked" offLabel="Unlocked" 
+                onIcon="pi pi-lock" offIcon="pi pi-lock-open" [ngClass]="{'on-state': tenant.active, 'off-state': !tenant.active}" 
+                styleClass="on-state" ariaLabel="Do you confirm" /> -->
+            </td>
+            <td>
+                {{tenant.timecreated | date}}
+            </td>
+        </tr>
+    </ng-template>
+    <ng-template #expandedrow let-tenant>
+        <tr>
+            <td colspan="8">
+                <div class="p-4">
+                    <div class="flex justify-between">
+                        <h5>{{'Subscription Details for' | translate}} {{ tenant.name }}</h5>
+                        <p-button [label]="'Add Subscription' | translate" [raised]="true" variant="outlined" severity="warn" icon="pi pi-plus"/>
+                    </div>
+                    <p-table [value]="tenantSubscriptions" dataKey="id">
+                        <ng-template #header>
+                            <tr>
+                                <th>{{'Start Date' | translate}}</th>
+                                <th>{{'End Date' | translate}}</th>
+                                <th>{{'Status' | translate}}</th>
+                                <th>{{'Days Left' | translate}}</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template #body let-subscriptions>
+                            <tr>
+                                <td>{{ subscriptions.startdate | date}}</td>
+                                <td>{{ subscriptions.enddate  | date}}</td>
+                                <td>
+                                    <p-tag [value]="tenant.active? ('Active' | translate) : ('Expired' | translate)" severity="success" />
+                                    <br/>
+                                    <p-tag *ngIf="canShowSubsWarning(subscriptions.startdate, subscriptions.enddate)" [value]="'Expiring Soon' | translate" [severity]="getSubscriptionSeverity(getDaysLeft(subscriptions.startdate, subscriptions.enddate))" />
+                                </td>
+                                <td>
+                                    <p-knob [ngModel]="getDaysLeft(subscriptions.startdate, subscriptions.enddate)" [readonly]="true" [max]="getTotalDays(subscriptions.startdate, subscriptions.enddate)"
+                                            rangeColor="SlateGray">
+                                    </p-knob>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template #emptymessage>
+                            <tr>
+                                <td colspan="6" style="text-align: center;">{{'There are no subscription for this tenant yet.' | translate}}</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+</div>
+</p-fluid>
