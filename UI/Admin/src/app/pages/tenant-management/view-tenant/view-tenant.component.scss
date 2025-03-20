@@ -1,0 +1,13 @@
+/* Style when ToggleButton is ON */
+.on-state {
+    background-color: #4caf50 !important; /* Green */
+    color: #4caf50 !important;
+    border-color: #4caf50 !important;
+  }
+  
+  /* Style when ToggleButton is OFF */
+  .off-state {
+    background-color: #f44336 !important; /* Red */
+    color: #f44336 !important;
+    border-color: #f44336 !important;
+  }
