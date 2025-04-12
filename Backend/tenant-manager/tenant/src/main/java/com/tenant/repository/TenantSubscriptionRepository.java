@@ -24,5 +24,10 @@ public interface TenantSubscriptionRepository extends JpaRepository<TenantSubscr
 
 	@Query(value = findExpireTSQuery, nativeQuery = true)
 	List<Long> findExpireTS(@Param("date") String date);
+	
+	String findActvateTSQuery = "select tenantid from TenantSubscription where active = true and startdate <= :date";
+
+	@Query(value = findActvateTSQuery, nativeQuery = true)
+	List<Long> findActvateTS(@Param("date") String date);
 
 }

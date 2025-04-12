@@ -9,6 +9,7 @@ import Nora from '@primeng/themes/nora';
 import { PrimeNG } from 'primeng/config';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { LayoutService } from '../service/layout.service';
+import { ColourPalletteService } from '../service/colourpallette.service';
 
 const presets = {
     Aura,
@@ -109,6 +110,10 @@ export class AppConfigurator {
         { label: 'Static', value: 'static' },
         { label: 'Overlay', value: 'overlay' }
     ];
+
+    constructor(private colourPalletteService: ColourPalletteService) {
+        this.colourPalletteService.setThemeColor(this.layoutService.layoutConfig().primary!);
+    }
 
     ngOnInit() {
         if (isPlatformBrowser(this.platformId)) {
@@ -412,11 +417,11 @@ export class AppConfigurator {
     updateColors(event: any, type: string, color: any) {
         if (type === 'primary') {
             this.layoutService.layoutConfig.update((state) => ({ ...state, primary: color.name }));
+            this.colourPalletteService.setThemeColor(color.name);
         } else if (type === 'surface') {
             this.layoutService.layoutConfig.update((state) => ({ ...state, surface: color.name }));
         }
         this.applyTheme(type, color);
-
         event.stopPropagation();
     }
 

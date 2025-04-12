@@ -1,0 +1,16 @@
+<loader/>
+<p-toast/>
+<div class="gap-2 w-full">
+    <label for="photo"><h6>{{label | translate}}</h6></label>
+    <p-fileupload id="photo" name="file" (onSelect)="onSelect($event)" (onUpload)="onUpload($event)" (onError)="uploadError($event)" (onClear)="onRemove()" 
+                  [multiple]="multiple" [accept]="acceptType" maxFileSize="1000000" mode="advanced" [url]="getUploadUrl()">
+        <ng-template #empty>
+            <div> {{ 'Drag and drop files to here to upload.' |translate }}</div>
+        </ng-template>
+        <ng-template #content>
+            <ul *ngIf="fileDetail.length">
+                <li *ngFor="let file of fileDetail">{{ file.fileName }} - {{ file.size }} bytes</li>
+            </ul>
+        </ng-template>
+    </p-fileupload>
+</div>

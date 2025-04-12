@@ -4,11 +4,15 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.search.engine.backend.types.Searchable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.annotations.ClassMetaProperty;
 import com.platform.convertors.AttributeEncryptor;
+import com.platform.entity.BaseLocale;
 import com.platform.entity.MultiTenantEntity;
 import com.platform.util.PlatformUtil;
 
@@ -23,23 +27,24 @@ import jakarta.persistence.PrePersist;
  */
 @MappedSuperclass
 @ClassMetaProperty(code = "USR")
-public class User extends MultiTenantEntity{
+public class User extends MultiTenantEntity implements BaseLocale {
 
 	private static final long serialVersionUID = 1L;
 	
 	public static String KEY_FNAME="fname";
 	public static String KEY_LNAME="lname";
 	public static String KEY_EMAILID="emailid";
+	public static String KEY_MOBILE="mobile";
 
 	@FullTextField
 	@Column(name = "UNIQUENAME", updatable = false)
 	private String uniquename;
 
-	@FullTextField
+	@GenericField(name = "fname", sortable = Sortable.YES, searchable = Searchable.YES)
 	@Column(name = "FNAME")
 	private String fname;
 	
-	@FullTextField
+	@GenericField(name = "lname", sortable = Sortable.YES, searchable = Searchable.YES)
 	@Column(name = "LNAME")
 	private String lname;
 
@@ -48,9 +53,9 @@ public class User extends MultiTenantEntity{
 	@Convert(converter = AttributeEncryptor.class)
 	private String mobile;
 
-	@FullTextField
 	//@PIIData(allowedRolePermissions = {Permissions.ADMIN, Permissions.MANAGE_USERS})
 	@Column(name = "EMAILID")
+	@Convert(converter = AttributeEncryptor.class)
 	private String emailid;
 
 	@JsonIgnore

@@ -39,7 +39,7 @@ public class TenantValidationFilter extends OncePerRequestFilter {
 	@Autowired
 	private MessageSource messageSource;
 
-	@Autowired
+	@Autowired(required = false)
 	@Qualifier("TenantService")
 	private BaseService tenantService;
 
@@ -69,6 +69,7 @@ public class TenantValidationFilter extends OncePerRequestFilter {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Tenant Header is Empty");
 			return;
 		}
+		BaseSession.SetTenantUniqueName(tenantUniqueName);
 		BaseEntity tenant = tenantService.findByUniqueName(tenantUniqueName);
 		if (!isValidTenant(tenant, response)) {
 			response.sendError(HttpServletResponse.SC_FORBIDDEN, messageSource
@@ -131,17 +132,6 @@ public class TenantValidationFilter extends OncePerRequestFilter {
 			return false;
 		}
 		return true;
-	}
-
-	private boolean isFromTrustedSubnet(String ip, HttpServletResponse response) throws IOException {
-		if (StringUtils.isAllBlank(ip)) {
-			Log.tenant.error("Invalid Request from Untrusted subnet addr.");
-			return false;
-		}
-		if (trustedSubnets.stream().filter(subnet -> ip.startsWith(subnet)).findAny().isPresent()) {
-			return true;
-		}
-		return false;
 	}
 
 }

@@ -30,13 +30,20 @@ public class QuartzServiceImpl implements BaseService {
 		return repo.findById(rootId).get();
 	}
 	
+	public void deleteJobInfo(String name, String group) {
+		QuartzJobInfo info = repo.findJob(group, name);
+		if(info != null) {
+			repo.delete(info);
+		}
+	}
+	
 	public QuartzJobInfo createQuartzJobInfo(String name, String group, boolean isRecurring) {
 		QuartzJobInfo info = new QuartzJobInfo();
 		info.setIsrecurring(isRecurring);
 		info.setJobname(name);
 		info.setJobgroup(group);
 		info.setTenantId(BaseSession.getTenantId());
-		return repo.save(info);
+		return repo.saveAndFlush(info);
 	}
 	
 	public QuartzJobHistory createOrUpdateQuartzHistory(String uuid, String name, String group, String status, String errorMsg) {

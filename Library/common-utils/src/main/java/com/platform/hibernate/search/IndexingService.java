@@ -16,23 +16,30 @@ import jakarta.persistence.EntityManager;
  * @author Muhil
  */
 @Configuration
-public class IndexingService implements ApplicationListener<ContextRefreshedEvent>{
-	
+public class IndexingService implements ApplicationListener<ContextRefreshedEvent> {
+
 	@Autowired
 	private EntityManager entityManager;
 
 	@Transactional("transactionManager")
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		SearchSession searchSes = Search.session(entityManager);
+		SearchSession searchSession = Search.session(entityManager);
 		try {
-			searchSes.massIndexer().idFetchSize(10).batchSizeToLoadObjects(5).threadsToLoadObjects(5).startAndWait();
-		}
-		catch(Exception e) {
+			// searchSession.massIndexer().idFetchSize(1000).batchSizeToLoadObjects(500).threadsToLoadObjects(5).startAndWait();
+			searchSession.massIndexer().start().thenRun(() -> Log.getLogger().info("Indexing completed!"));
+		} catch (Exception e) {
 			Log.platform.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
 		}
-		
 	}
+	
+	@Transactional("transactionManager")
+    public void rebuildIndex() {
+        SearchSession searchSession = Search.session(entityManager);
+        searchSession.massIndexer()
+            .start()
+            .thenRun(() -> Log.getLogger().info("Re-Indexing completed!"));
+    }
 
 }

@@ -27,7 +27,7 @@ public class DatabaseConfiguration {
 	@Value("${platform.database.driver-class-name}")
 	private String driverClassName;
 
-	@Bean
+	@Bean("ds")
 	public DataSource dataSource() {
 		return DataSourceBuilder.create().url(url).username(username).password(password)
 				.driverClassName(driverClassName).build();

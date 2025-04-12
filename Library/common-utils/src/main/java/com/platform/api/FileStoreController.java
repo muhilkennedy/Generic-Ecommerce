@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -65,13 +67,16 @@ public class FileStoreController {
 	
 	@UserPermission(values = { Permissions.SUPER_USER, Permissions.ADMIN })
 	@PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
-	public GenericResponse<FileStore> uploadDocument(@RequestParam("file") MultipartFile file,
+	public GenericResponse<FileStore> uploadDocument(@RequestParam("file") List<MultipartFile> files,
 			@RequestParam("internalFile") boolean internalFile) throws IllegalStateException, IOException {
 		GenericResponse<FileStore> response = new GenericResponse<>();
-		return response
-				.setStatus(Response.Status.OK).setData(storageService
-						.uploadClientFileToFileStore(FileUtil.generateFileFromMutipartFile(file), internalFile))
-				.build();
+		List<FileStore> fileList = new ArrayList<FileStore>();
+		for (MultipartFile file : files) {
+			fileList.add(storageService.uploadClientFileToFileStore(FileUtil.generateFileFromMutipartFile(file),
+					internalFile));
+		}
+		return response.setStatus(Response.Status.OK).setDataList(fileList).build();
+		
 	}
 
 	@UserPermission(values = { Permissions.SUPER_USER, Permissions.ADMIN })

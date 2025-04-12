@@ -2,6 +2,8 @@ package com.platform.util;
 
 import java.text.SimpleDateFormat;
 
+import com.platform.logging.Log;
+
 /**
  * @author Muhil
  *
@@ -22,9 +24,11 @@ public class PlatformUtil {
 	public static final String TENANT_HEADER = "X-Tenant";
 	public static final String TENANTID_HEADER = "X-TenantId";
 	public static final String TOKEN_HEADER = "X-Token";
+	public static final String TOKEN_BEARER = "Bearer ";
 	
 	public static final String TENANT_PARAM = "tenantId";
 	public static final String USER_PARAM = "userId";
+	public static final String RUN_FOR_ALL_PARAM = "runForAllTenants";
 	
 	public static final String DOT_OPERATOR = ".";
 	public static final String COLON_SEPERATOR = ":";
@@ -46,5 +50,14 @@ public class PlatformUtil {
 	
 	public static final SimpleDateFormat SIMPLE_DATE_ONLY_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 	public static final SimpleDateFormat SIMPLE_UI_DATE_ONLY_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+	
+	public static void printStartupLog() {
+		Log.logger.info("Heap Size = {}", (Runtime.getRuntime().totalMemory() / 1000000000.0) + " GB");
+		Log.logger.info("Max Memory Size = {}", (Runtime.getRuntime().maxMemory() / 1000000000.0) + " GB");
+		Log.logger.info("Total Memory Size = {}", (Runtime.getRuntime().freeMemory() / 1000000000.0) + " GB");
+		Log.logger.info("##############################");
+		Log.logger.info("Application Startup Completed");
+		Log.logger.info("##############################");
+	}
 
 }

@@ -8,10 +8,14 @@ import { ToastMessageService } from '../../service/toastmessage/toast-message.se
 import { CookieService } from 'ngx-cookie-service';
 import { CommonUtil } from '../../util/CommonUtil.service';
 import { Router } from '@angular/router';
+import { Employee } from '../../model/employee';
+import { EmployeeService } from '../../service/employee/employee.service';
+import { EmployeeDataService } from '../../service/shared/employee/employee-data.service';
+import { SpinnerComponent } from "../shared/spinner";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ NgxSpinnerModule, TranslateModule, ToastModule ],
+  imports: [NgxSpinnerModule, TranslateModule, ToastModule, SpinnerComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -21,12 +25,13 @@ export class DashboardComponent {
   recentTenants: number = 0;
 
   constructor(private spinner: NgxSpinnerService, private translate: TranslateService, private cookieService: CookieService,
-              private messageService: ToastMessageService, private tenantService: TenantService, private router: Router){}
+              private messageService: ToastMessageService, private tenantService: TenantService, private router: Router,
+              private employeeService: EmployeeService, private userData: EmployeeDataService,){}
 
   ngOnInit(){
     if(CommonUtil.isNullOrEmptyOrUndefined(this.cookieService.get(CommonUtil.KEY_TOKEN))) {
-      this.router.navigate(['/auth/login']);
-      return;
+      this.router.navigate(['/login']);
+      return;        
     }
     this.spinner.show();
     this.tenantService.getAllTenantsCountForDashboard().subscribe({
@@ -36,6 +41,7 @@ export class DashboardComponent {
       },
       error: (error) => {
         this.messageService.showErrorMessage("Failed to load Dashboard data.");
+        this.spinner.hide();
       },
       complete: () => {
         this.spinner.hide();

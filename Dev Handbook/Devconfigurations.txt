@@ -260,5 +260,23 @@ ngrok http --domain=safe-heroic-hagfish.ngrok-free.app 8080
 ngrok http 8080 (dynamic domain name)
 
 
+-------------------
+
+CLAMAV Service:
+
+docker build -t clamav
+docker run -d --name clamav -p 3310:3310 clamav
+
+docker logs clamav
+
+docker inspect clamav-container | grep IPAddress
+
+docker exec -it clamav-container sh
+Update ipadrr to access from outside
+# Allow TCP connections on port 3310
+TCPSocket 3310
+TCPAddr 0.0.0.0
+
+check connection -> nc -zv localhost 3310
 
 

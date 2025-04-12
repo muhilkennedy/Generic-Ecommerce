@@ -7,17 +7,23 @@ import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.search.engine.backend.types.Searchable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.annotations.ClassMetaProperty;
+import com.platform.convertors.AttributeEncryptor;
 import com.platform.entity.BasePermission;
 import com.platform.user.permissions.Permissions;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
@@ -31,10 +37,12 @@ import jakarta.persistence.Table;
 @Table(name = "EMPLOYEE")
 @ClassMetaProperty(code = "EMP")
 @Indexed(index = "employee_index")
+@NamedEntityGraph(name = "Employee.detail", attributeNodes = { @NamedAttributeNode("employeeRoles"), @NamedAttributeNode("employeeInfo") })
 public class Employee extends User implements BasePermission {
 
 	private static final long serialVersionUID = 2L;
 
+	@GenericField(name = "designation", searchable = Searchable.YES)
 	@Column(name = "DESIGNATION")
 	private String designation;
 
@@ -43,13 +51,14 @@ public class Employee extends User implements BasePermission {
 	
 	//@PIIData(allowedRolePermissions = { Permissions.ADMIN, Permissions.MANAGE_USERS })
 	@Column(name = "SECONDARYEMAIL")
+	@Convert(converter = AttributeEncryptor.class)
 	private String secondaryemail;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<EmployeeRole> employeeRoles;
 
-	@OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private EmployeeInfo employeeInfo;
 	
 	public Employee() {
@@ -105,7 +114,7 @@ public class Employee extends User implements BasePermission {
 	
 	@Override
 	protected void generateUniqueName() {
-		setUniquename("EMP-".concat(UUID.randomUUID().toString()));
+		setUniquename("E".concat(UUID.randomUUID().toString()));
 	}
 	
 	@Override

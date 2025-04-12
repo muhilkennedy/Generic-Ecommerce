@@ -21,28 +21,25 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { ToastMessageService } from '../../../service/toastmessage/toast-message.service';
 import { TenantService } from '../../../service/tenant/tenant.service';
 import { switchMap } from 'rxjs';
+import { SpinnerComponent } from '../../shared/spinner';
 
 @Component({
   selector: 'app-onboard-tenant',
   imports: [InputTextModule, ButtonModule, SelectModule, FormsModule, InputMaskModule, CommonModule, ToastModule, FileUploadModule,
-    FluidModule, TextareaModule, ReactiveFormsModule, TranslateModule, FloatLabelModule, StepperModule, DatePicker, NgxSpinnerModule],
+    FluidModule, TextareaModule, ReactiveFormsModule, TranslateModule, FloatLabelModule, StepperModule, DatePicker, NgxSpinnerModule, SpinnerComponent],
   templateUrl: './onboard-tenant.component.html',
   styleUrl: './onboard-tenant.component.scss'
 })
 export class OnboardTenantComponent {
 
+  activeStep: number = 1;
+
   timeZones!: string[];
   cities!: any[];
-  states: string[] = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-    "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
-    "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
-    "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
-    "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
-    "Uttar Pradesh", "Uttarakhand", "West Bengal"];
-  locales: string[] = ['en', 'ta'];
+  states: string[] = [];
+  locales: any[] = [];
 
   postalLoad: boolean = false;
-  activeStep: number = 1;
   selectedFiles: any[] = [];
   uploadedFiles: any[] = [];
   isFileUploaded: boolean = false;
@@ -57,6 +54,8 @@ export class OnboardTenantComponent {
   }
 
   ngOnInit() {
+    this.states = CommonUtil.states;
+    this.locales = CommonUtil.locales;
     this.detailsFormGroup = this.fb.group({
       name: ['', Validators.required],
       uniqueName: ['', Validators.required],
@@ -108,7 +107,7 @@ export class OnboardTenantComponent {
 
   onUpload(event: any) {
     this.uploadedFiles[0] = event.files[0];
-    this.logoFileId = event.originalEvent.body.data.rootid;
+    this.logoFileId = event.originalEvent.body.dataList[0].rootid;
     this.isFileUploaded = true;
   }
 
@@ -118,6 +117,15 @@ export class OnboardTenantComponent {
 
   getUploadUrl(): string {
     return `${environment.apiUrl}/tm/admin/file/upload?internalFile=false`;
+  }
+
+  uploadError(event: any) {
+    if(CommonUtil.isNotNullOrEmptyOrUndefined(event.error)){
+      this.messageService.showErrorMessage(event.error.error.message, event.error.error.errorCode);
+    }
+    else{
+      this.messageService.showErrorMessage('Error while uploading file');
+    }
   }
 
   canSaveTenant() {

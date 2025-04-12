@@ -10,17 +10,17 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.platform.entity.BaseEntity;
 import com.platform.exceptions.BGWorkException;
+import com.platform.logging.AuditOperation;
 import com.platform.logging.Log;
 import com.platform.server.BaseSession;
+import com.platform.service.AuditService;
 import com.platform.service.BaseService;
-import com.platform.util.BasicUtil;
 import com.platform.util.PlatformUtil;
 
 /**
@@ -29,7 +29,7 @@ import com.platform.util.PlatformUtil;
  * executed via scheduled job.
  */
 @Component
-@PersistJobDataAfterExecution
+@PersistJobDataAfterExecution //we can persist some data if required in jobdata map for subsequent executions
 public abstract class BGJob implements Job {
 
 	@Autowired
@@ -39,14 +39,11 @@ public abstract class BGJob implements Job {
 	@Autowired
 	private Scheduler quartzScheduler;
 	
-//	@Autowired
-//	private AuditService auditService;
+	@Autowired
+	protected AuditService auditService;
 	
-//	@Autowired
-//	private QuartzService quartzJobService;
-
-//	@Value("${spring.quartz.overwrite-existing-jobs}")
-//	private boolean overrideJobs;
+	@Autowired
+	protected BGWorkScheduler jobScheduler;
 	
 	/**
 	 * @param event Execute after application startup to schedule the default jobs.
@@ -58,7 +55,7 @@ public abstract class BGJob implements Job {
 	}
 
 	/**
-	 * Schedule the job
+	 * Schedule the job using BGWorkScheduler (jobScheduler)
 	 * 
 	 * @throws SchedulerException
 	 */
@@ -72,10 +69,23 @@ public abstract class BGJob implements Job {
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		JobDetail detail = context.getJobDetail();
 		if (detail != null && detail.getJobDataMap() != null) {
-			BaseSession.setupSession(detail.getJobDataMap().getLong(PlatformUtil.TENANT_PARAM),
-					detail.getJobDataMap().getLong(PlatformUtil.USER_PARAM));
 			try {
-				run(context);
+				if ((Boolean) detail.getJobDataMap().get(PlatformUtil.RUN_FOR_ALL_PARAM)) {
+					runForAllTenants(context);
+				} 
+				else {
+					try {
+						BaseSession.setupSession(detail.getJobDataMap().getLong(PlatformUtil.TENANT_PARAM),
+								detail.getJobDataMap().getLong(PlatformUtil.USER_PARAM));
+						run(context);
+					} catch (BGWorkException e) {
+						Log.platform.error("BGWork failed: {}", e);
+						auditService.logAudit(BaseSession.getTenant(), BaseSession.getUser(), e.getMessage(), AuditOperation.BGWORK, this);
+						throw e;
+					} finally {
+						teardownSession();
+					}
+				}
 			} catch (BGWorkException e) {
 				throw new JobExecutionException(e);
 			}
@@ -94,21 +104,22 @@ public abstract class BGJob implements Job {
 	public abstract void run(JobExecutionContext context) throws BGWorkException;
 
 	public void runForAllTenants(JobExecutionContext context) throws BGWorkException {
-		//assuming 1000 tenants to be max, mostly we will never touch this limit
-		baseTenantService.findAll(BasicUtil.getPageable(0, 1000)).stream().peek(tenant -> Log.platform.info("Executing BGWork {} for tenant : {}",
-				this.getClass().getSimpleName(), tenant)).forEach(tenant -> {
-					try {
-						setupSession((BaseEntity) tenant);
-						run(context);
-					} catch (BGWorkException e) {
-						String msg = String.format("Error running job for tenant : {%s} : {%s}", tenant, e);
-						Log.platform.error(msg);
-						//auditService.logAuditInfo(AuditOperation.SCHEDULEDTASKERROR, msg);
-					}
-					finally {
-						teardownSession();
-					}
-				});
+		//Assumption: 100 tenants to be max, mostly we will never touch this limit
+		for(Object tenant : baseTenantService.findAll()) {
+			Log.platform.info("Executing BGWork {} for tenant : {}");
+			try {
+				setupSession((BaseEntity) tenant);
+				run(context);
+			} catch (BGWorkException e) {
+				String msg = String.format("Error running job for tenant : {%s} : {%s}", tenant, e);
+				Log.platform.error(msg);
+				auditService.logAudit(BaseSession.getTenant(), BaseSession.getUser(), msg, AuditOperation.BGWORK, this);
+				throw e;
+			}
+			finally {
+				teardownSession();
+			}
+		}
 	}
 
 	protected String getJobId(Class<?> cls) {

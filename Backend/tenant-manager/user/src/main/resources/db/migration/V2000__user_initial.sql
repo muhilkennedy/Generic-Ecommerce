@@ -13,13 +13,15 @@ CREATE TABLE IF NOT EXISTS employee (
     uniquename VARCHAR(50) NOT NULL,
     fname VARCHAR(50),
     lname VARCHAR(50),
-    emailid VARCHAR(50),
+    emailid VARCHAR(512),
+    secondaryemail VARCHAR(512),
     mobile VARCHAR(512),
     password VARCHAR(512),
     reportsto BIGINT,
     logintype VARCHAR(10),
     CONSTRAINT fk_tenant_employee FOREIGN KEY (tenantid) REFERENCES tenant (rootid),
     CONSTRAINT con_tenant_emp_email UNIQUE (tenantid, emailid),
+    CONSTRAINT con_tenant_emp_secemail UNIQUE (tenantid, secondaryemail),
     CONSTRAINT con_tenant_emp_mobile UNIQUE (tenantid, mobile),
     CONSTRAINT con_tenant_emp_uniquename UNIQUE (tenantid, uniquename)
 );
@@ -33,11 +35,10 @@ CREATE TABLE IF NOT EXISTS employeeinfo (
     modifiedby BIGINT DEFAULT 0,
     createdby BIGINT DEFAULT 0,
     version BIGINT DEFAULT 0,
-    dob VARCHAR(16),
+    dob TIMESTAMP,
     gender VARCHAR(12),
     prooffileid BIGINT,
     profilepic VARCHAR(512),
-    secondaryemail VARCHAR(50),
     designation VARCHAR(64),
     employeeid BIGINT,
     CONSTRAINT fk_prooffileid FOREIGN KEY (prooffileid) REFERENCES filestore (rootid),
@@ -97,9 +98,11 @@ CREATE TABLE IF NOT EXISTS userhash (
     createdby BIGINT DEFAULT 0,
     version BIGINT DEFAULT 0,
     uniquename VARCHAR(50) NOT NULL,
-    mobile VARCHAR(300) NOT NULL,
+    mobile VARCHAR(512) NOT NULL,
+    email VARCHAR(512) NOT NULL,
     CONSTRAINT fk_tenant_customer FOREIGN KEY (tenantid) REFERENCES tenant (rootid),
-	CONSTRAINT con_tenant_usrhash_mobile UNIQUE (tenantid, mobile)
+	CONSTRAINT con_tenant_usrhash_mobile UNIQUE (tenantid, mobile),
+	CONSTRAINT con_tenant_usrhash_email UNIQUE (tenantid, email)
 );
 
 -- Store employee/user preferences as required
@@ -119,14 +122,14 @@ CREATE TABLE usersettings (
 );
 
 /* Initial Data Load */
-INSERT INTO employee (rootid, tenantid, active, fname, lname, mobile, emailid, password, timecreated, timeupdated, createdby, modifiedby, uniquename, logintype)
+INSERT INTO employee (rootid, tenantid, active, fname, lname, mobile, emailid, password, timecreated, timeupdated, createdby, modifiedby, uniquename, logintype, secondaryemail)
 VALUES
-    (-1, -1, TRUE, 'Support', 'admin', 'nxXOGrB6XRXiXy2BuMmjqg==', 'superuser', '$2a$15$lc/un/P2saK1lpD.l2R8GOhdH0yvcrgot2gATMU.jEjwn4q7tGy9u', 0, 0, 0, 0, 'EMP-5c9c7025-08de-473d-bc8c-29f79c5541b6', 'INTERNAL');
+    (-1, -1, TRUE, 'Support', 'admin', 'e07XTecZ/jB6jCjGGaAH4r6CFcBF/M8xaefNmHfpmKk=', 'ZMCpmVAb0HIVqYxXRsqVCCnd1CV2JgSzL4MkQXa2XdE=', '$2a$15$lc/un/P2saK1lpD.l2R8GOhdH0yvcrgot2gATMU.jEjwn4q7tGy9u', 0, 0, 0, 0, 'EMP-5c9c7025-08de-473d-bc8c-29f79c5541b6', 'INTERNAL', 'A0NoSCmO4WeLZrlc4ILRdvp1ITPl0CIxEdd9hmMqUi6PW4t0MVr1CA4jRzfBbMRs');
 
 INSERT INTO employeeinfo (rootid, tenantid, active, gender, employeeid)
 VALUES
     (-1, -1, TRUE, 'MALE', -1);
     
-INSERT INTO userhash (rootid, tenantid, uniquename, mobile, timeupdated, timecreated, createdby, modifiedby)
+INSERT INTO userhash (rootid, tenantid, uniquename, mobile, email, timeupdated, timecreated, createdby, modifiedby)
 VALUES
-	(-1, -1, 'EMP-5c9c7025-08de-473d-bc8c-29f79c5541b6', 'DLLMZ42eccor0clqdeXyd2ZuhG129oQTKK+dPz4i+OE=', 0,0,0,0);
+	(-1, -1, 'EMP-5c9c7025-08de-473d-bc8c-29f79c5541b6', 'DLLMZ42eccor0clqdeXyd2ZuhG129oQTKK+dPz4i+OE=', 'OCEycBxHM8NAJwbP3TyPx/QfgKiNzlQo0UUlmkHF8S8=', 0,0,0,0);

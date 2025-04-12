@@ -9,7 +9,7 @@ export class Employee extends Entity {
     mobile!: string;
     reportsto!: number;
     designation?: string; //optional
-    employeeinfo!: EmployeeInfo;
+    employeeInfo!: EmployeeInfo;
     userPermissions!: Array<string>
 }
 

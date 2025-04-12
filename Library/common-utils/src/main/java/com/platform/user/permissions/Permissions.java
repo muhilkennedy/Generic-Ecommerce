@@ -1,5 +1,6 @@
 package com.platform.user.permissions;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -29,6 +30,10 @@ public enum Permissions {
 	
 	public static Stream<Permissions> stream() {
 		return Stream.of(Permissions.values());
+	}
+	
+	public static List<String> getAllPermissions() {
+		return stream().map(perm -> perm.value).toList();
 	}
 	
 	public static String getPermissionsAsString(Permissions[] permissions) {

@@ -2,6 +2,9 @@ package com.platform.entity;
 
 import java.io.Serializable;
 
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+
 import com.platform.hibernate.configuration.BaseEntityListener;
 
 import jakarta.persistence.Column;
@@ -33,9 +36,11 @@ public class BaseEntity implements Serializable {
 	@Column(name = "ROOTID", updatable = false, nullable = false)
 	private long rootid;
 
+	@GenericField(name = "timeupdated", sortable = Sortable.YES)
 	@Column(name = "TIMEUPDATED")
 	private long timeupdated;
 
+	@GenericField(name = "timecreated", sortable = Sortable.YES)
 	@Column(name = "TIMECREATED")
 	private long timecreated;
 
@@ -48,6 +53,7 @@ public class BaseEntity implements Serializable {
 	@Column(name = "VERSION")
 	private long version;
 
+	@GenericField(name = "active", sortable = Sortable.YES)
 	@Column(name = "ACTIVE", columnDefinition = "boolean default true")
 	private boolean active;
 

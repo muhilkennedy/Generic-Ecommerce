@@ -1,0 +1,258 @@
+<p-toast />
+<loader/>
+<p-fluid>
+    <div class="card flex flex-col gap-6 w-full justify-center">
+        <p-stepper [(value)]="activeStep" [linear]="true">
+            <p-step-list>
+                <p-step [value]="1" class="flex flex-row flex-auto gap-2">
+                    <ng-template #content let-activateCallback="activateCallback" let-value="value">
+                        <button class="bg-transparent border-0 inline-flex flex-col gap-2" (click)="activateCallback()">
+                            <span
+                                class="rounded-full border-2 w-12 h-12 inline-flex items-center justify-center"
+                                [ngClass]="{
+                                    'bg-primary text-primary-contrast border-primary': value <= activeStep,
+                                    'border-surface': value > activeStep}">
+                                <i class="pi pi-user"></i>
+                            </span>
+                        </button>
+                    </ng-template>
+                </p-step>
+    
+                <p-step [value]="2" class="flex flex-row flex-auto gap-2">
+                    <ng-template #content let-activateCallback="activateCallback" let-value="value">
+                        <button class="bg-transparent border-0 inline-flex flex-col gap-2" (click)="activateCallback()">
+                            <span
+                                class="rounded-full border-2 w-12 h-12 inline-flex items-center justify-center"
+                                [ngClass]="{
+                                    'bg-primary text-primary-contrast border-primary': value <= activeStep,
+                                    'border-surface': value > activeStep}">
+                                <i class="pi pi-key"></i>
+                            </span>
+                        </button>
+                    </ng-template>
+                </p-step>
+    
+                <p-step [value]="3" class="flex flex-row flex-auto gap-2">
+                    <ng-template #content let-activateCallback="activateCallback" let-value="value">
+                        <button class="bg-transparent border-0 inline-flex flex-col gap-2" (click)="activateCallback()">
+                            <span
+                                class="rounded-full border-2 w-12 h-12 inline-flex items-center justify-center"
+                                [ngClass]="{
+                                    'bg-primary text-primary-contrast border-primary': value <= activeStep,
+                                    'border-surface': value > activeStep}">
+                                <i class="pi pi-id-card"></i>
+                            </span>
+                        </button>
+                    </ng-template>
+                </p-step>
+
+                <p-step [value]="4" class="flex flex-row flex-auto gap-2">
+                    <ng-template #content let-activateCallback="activateCallback" let-value="value">
+                        <button class="bg-transparent border-0 inline-flex flex-col gap-2" (click)="activateCallback()">
+                            <span
+                                class="rounded-full border-2 w-12 h-12 inline-flex items-center justify-center"
+                                [ngClass]="{
+                                    'bg-primary text-primary-contrast border-primary': value <= activeStep,
+                                    'border-surface': value > activeStep}">
+                                <i class="pi pi-id-card"></i>
+                            </span>
+                        </button>
+                    </ng-template>
+                </p-step>
+            </p-step-list>
+
+            <!-- PANEL CONTENT -->
+
+            <p-step-panels>
+                <p-step-panel [value]="1">
+                    <ng-template #content let-activateCallback="activateCallback">
+                        <div class="flex flex-col gap-2 mx-auto" [formGroup]="detailsFormGroup">
+                            <div class="text-center mt-4 mb-4 text-xl font-semibold">{{'Employee Details' | translate}}</div>
+                            <div class="flex flex-col md:flex-row gap-6">
+                                <div class="gap-2 w-full">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="fname" autocomplete="off" formControlName="firstName" [class]="getErrorClassIfPresent(detailsFormGroup, 'firstName')"/>
+                                        <label for="fname">{{'First Name' | translate}}</label>
+                                        <small class="p-error" *ngIf="hasError(detailsFormGroup, 'firstName')" style="color: red;">{{'First Name is required' | translate}}</small>
+                                    </p-floatlabel>
+                                </div>
+                                <div class="gap-2 w-full">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="lname" autocomplete="off" formControlName="lastName" [class]="getErrorClassIfPresent(detailsFormGroup, 'lastName')"/>
+                                        <label for="lname">{{'Last Name' | translate}}</label>
+                                        <small class="p-error" *ngIf="hasError(detailsFormGroup, 'lastName')" style="color: red;">{{'Last Name is required' | translate}}</small>
+                                    </p-floatlabel>
+                                </div>
+                            </div>
+                            <div class="flex flex-col md:flex-row gap-6">
+                                <div class="gap-2 w-full">
+                                    <p-floatlabel variant="on">
+                                        <p-inputmask id="mm" mask="9999999999" formControlName="mobile" [class]="getErrorClassIfPresent(detailsFormGroup, 'mobile')"/>
+                                        <label for="mm">{{'Contact' | translate}}</label>
+                                        <small class="p-error" *ngIf="hasError(detailsFormGroup, 'mobile')" style="color: red;">{{'Mobile is required' | translate}}</small>
+                                    </p-floatlabel>
+                                </div>
+                                <div class="gap-2 w-full">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="emailId" autocomplete="off" formControlName="emailId" [class]="getErrorClassIfPresent(detailsFormGroup, 'emailId')"/>
+                                        <label for="emailId">{{'EmailId' | translate}}</label>
+                                        <small class="p-error" *ngIf="hasError(detailsFormGroup, 'emailId')" style="color: red;">{{'EmailId is required' | translate}}</small>
+                                    </p-floatlabel>
+                                </div>
+                            </div>
+                            <div class="flex flex-col md:flex-row gap-6">
+                                <div class="gap-2 w-full">
+                                    <p-floatlabel variant="on">
+                                        <p-datepicker id="dob" formControlName="dob" selectionMode="single" [readonlyInput]="true" dateFormat="dd/mm/yy" showIcon="true" [class]="getErrorClassIfPresent(detailsFormGroup, 'reportsTo')"/>
+                                        <label for="dob">{{'Date Of Birth' | translate}}</label>
+                                        <small class="p-error" *ngIf="hasError(detailsFormGroup, 'reportsTo')" style="color: red;">{{'Date Of Birth is required' | translate}}</small>
+                                    </p-floatlabel>
+                                </div>
+                                <div class="gap-2 w-full">
+                                    <p-floatlabel class="w-full" variant="on">
+                                        <p-select inputId="locale" [options]="locales" optionLabel="name" optionValue="code" styleClass="w-full" 
+                                        formControlName="locale" [class]="getErrorClassIfPresent(detailsFormGroup, 'locale')"/>
+                                        <label for="locale">{{'Locale' | translate}}</label>
+                                        <small class="p-error" *ngIf="hasError(detailsFormGroup, 'locale')" style="color: red;">{{'Locale is required' | translate}}</small>
+                                    </p-floatlabel>
+                                </div>
+                            </div>
+                            <div class="flex flex-col md:flex-row gap-6">
+                                <div class="gap-2 w-full">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="Designation" autocomplete="off" formControlName="designation" [class]="getErrorClassIfPresent(detailsFormGroup, 'designation')"/>
+                                        <label for="Designation">{{'Designation' | translate}}</label>
+                                        <small class="p-error" *ngIf="hasError(detailsFormGroup, 'designation')" style="color: red;">{{'Designation is required' | translate}}</small>
+                                    </p-floatlabel>
+                                </div>
+                                <div class="gap-2 w-full">
+                                    <p-floatlabel variant="on">
+                                        <p-autocomplete id="report" formControlName="reportsTo" minLength="3" delay="500"
+                                                        [suggestions]="filteredEmployees" (completeMethod)="filterEmployees($event)" optionLabel="fullName"
+                                                        [class]="getErrorClassIfPresent(detailsFormGroup, 'reportsTo')">
+                                        </p-autocomplete>
+                                        <label for="report">{{'Reports To' | translate}}</label>
+                                        <small class="p-error" *ngIf="hasError(detailsFormGroup, 'reportsTo')" style="color: red;">{{'Reports To is required' | translate}}</small>
+                                    </p-floatlabel>
+                                </div>
+                            </div>
+                            <div class="flex flex-col md:flex-row gap-6">
+                                <div class="gap-2 w-full">
+                                    <p-floatlabel variant="on">
+                                        <input pInputText id="secEmail" autocomplete="off" formControlName="secondaryEmail" [class]="getErrorClassIfPresent(detailsFormGroup, 'secondaryEmail')"/>
+                                        <label for="secEmail">{{'Secondary Email (Gmail preferred for oauth login)' | translate}}</label>
+                                        <small class="p-error" *ngIf="hasError(detailsFormGroup, 'secondaryEmail')" style="color: red;">{{'Secondary EmailId is required' | translate}}</small>
+                                    </p-floatlabel>
+                                </div>
+                                <div class="gap-2 w-full">
+                                    <div class="flex flex-wrap gap-4">
+                                        <div class="flex items-center">
+                                            <p-radiobutton id="male" value="Male" formControlName="gender" inputId="male" />
+                                            <label for="male" class="ml-2">{{'Male' | translate}}</label>
+                                        </div>
+                                    
+                                        <div class="flex items-center">
+                                            <p-radiobutton id="female" value="Female" formControlName="gender" inputId="female" />
+                                            <label for="female" class="ml-2">{{'Female' | translate}}</label>
+                                        </div>
+                                    
+                                        <div class="flex items-center">
+                                            <p-radiobutton id="others" value="Others" formControlName="gender" inputId="others" />
+                                            <label for="others" class="ml-2">{{'Others' | translate}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex pt-6 justify-end">
+                            <p-button [disabled]="detailsFormGroup.invalid" (onClick)="activateCallback(2); loadRoles()" [label]="'Next' | translate" icon="pi pi-arrow-right" iconPos="right" />
+                        </div>
+                    </ng-template>
+                </p-step-panel>
+    
+                <p-step-panel [value]="2">
+                    <ng-template #content let-activateCallback="activateCallback">
+                        <div class="flex flex-col gap-2 mx-auto" style="min-height: 16rem; max-width: 24rem">
+                            <div class="text-center mt-4 mb-4 text-xl font-semibold">{{'Choose employee roles' | translate}}</div>
+                            <div class="flex flex-wrap justify-center gap-4">
+                                <div *ngFor="let role of roles">
+                                    <p-toggleButton 
+                                      [(ngModel)]="role.selected" 
+                                      [onLabel]="role.rolename" 
+                                      [offLabel]="role.rolename"
+                                      [onIcon]="'pi pi-check'">
+                                    </p-toggleButton>
+                                  </div>
+                            </div>
+                        </div>
+                        <div class="flex pt-6 justify-between">
+                            <p-button (onClick)="activateCallback(1)" [label]="'Back' | translate" severity="secondary" icon="pi pi-arrow-left" />
+                            <p-button (onClick)="activateCallback(3)" [label]="'Next' | translate" icon="pi pi-arrow-right" iconPos="right" />
+                        </div>
+                    </ng-template>
+                </p-step-panel>
+    
+                <p-step-panel [value]="3">
+                    <ng-template #content let-activateCallback="activateCallback">
+                        <div class="flex flex-col gap-2 mx-auto" >
+                            <div class="text-center mt-4 mb-4 text-xl font-semibold">{{'Upload employee proof' | translate}}</div>
+                            <div class="flex flex-col md:flex-row gap-6">
+                                <div class="gap-2 w-full">
+                                    <app-file-upload [label]="'Employee Photo' | translate" [multiple]="false" [internalFile]="false" (fileDetails)="uploadedPicFileDetails($event)"></app-file-upload>
+                                </div>
+                                <div class="gap-2 w-full">
+                                    <app-file-upload [label]="'Employee Id Proof (Aadhaar / license)' | translate" [multiple]="false" [internalFile]="true" acceptType="image/*,application/pdf" (fileDetails)="uploadedProofFileDetails($event)"></app-file-upload>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex pt-6 justify-between">
+                            <p-button (onClick)="activateCallback(3)" [label]="'Back' | translate" severity="secondary" icon="pi pi-arrow-left" />
+                            <p-button [disabled]="canSaveEmployee()" [label]="'ONBOARD EMPLOYEE' | translate" [raised]="true" variant="outlined" severity="success" icon="pi pi-save"
+                                    (onClick)="activateCallback(4); saveEmployee()"/>
+                        </div>
+                    </ng-template>
+                </p-step-panel>
+
+                <p-step-panel [value]="4">
+                    <ng-template #content let-activateCallback="activateCallback">
+                        <div class="flex flex-col gap-2 mx-auto" style="min-height: 16rem; max-width: 24rem">
+                            <div class="text-center mt-4 mb-4 text-xl font-semibold">{{'Employee onboarded successfully' | translate}}</div>
+                        </div>
+                        <div class="mb-4 p-8 flex items-center justify-center">
+                            <p-card [style]="{ width: '25rem', overflow: 'hidden' }">
+                                <ng-template #header>
+                                    <img [alt]="employee.fname" class="w-full" [src]="employee.employeeInfo.profilepic" />
+                                </ng-template>
+                                <ng-template #title> 
+                                    {{employee.fname}} {{employee.lname}}
+                                </ng-template>
+                                <ng-template #subtitle>
+                                    {{employee.uniquename}}
+                                </ng-template>
+                                <p>
+                                    {{employee.mobile}}
+                                </p>
+                                <p>
+                                    {{employee.emailid}}
+                                </p>
+                                <!-- <p>
+                                    {{employee.userPermissions}}
+                                </p> -->
+                                <ng-template #footer>
+                                    <div class="flex gap-4 mt-1">
+                                        {{'Sucessfully onboarded employee' | translate}}
+                                        <!-- <p-button label="Cancel" severity="secondary" class="w-full" [outlined]="true" styleClass="w-full" />
+                                        <p-button label="Save" class="w-full" styleClass="w-full" /> -->
+                                    </div>
+                                </ng-template>
+                            </p-card>
+                        </div>
+                        <!-- <div class="flex pt-6 justify-start">
+                            <p-button (onClick)="activateCallback(3)" label="Back" severity="secondary" icon="pi pi-arrow-left" />
+                        </div> -->
+                    </ng-template>
+                </p-step-panel>
+            </p-step-panels>
+        </p-stepper>
+    </div>
+</p-fluid>

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.Assert;
 
 import com.platform.annotations.ClassMetaProperty;
+import com.platform.antivirus.ClamAVService;
 import com.platform.logging.Log;
 
 import jakarta.annotation.PostConstruct;
@@ -31,6 +33,15 @@ public class StartupValidations {
 	
 	@Autowired
 	private StringRedisTemplate redisTemplate;
+	
+	@Value("${spring.cache.enabled}")
+	private boolean cacheEnabled;
+	
+	@Value("${antivirus.clamav.enabled}")
+	private boolean clamAvEnabled;
+	
+	@Autowired(required = false)
+	private ClamAVService clamAvService;
 
 	/**
 	 * Execute methods on post construct
@@ -61,24 +72,28 @@ public class StartupValidations {
 	@EventListener
 	private void onApplicationEvent(ApplicationReadyEvent event) throws PortUnreachableException, ParseException {
 		clearInitialCaches();
-		/*
-		 * if (PropertiesUtil.getBooleanProperty("app.security.clamav.enabled")) {
-		 * pingClamAVService(); } if
-		 * (PropertiesUtil.getBooleanProperty("app.email.startup.loadtemplate")) {
-		 * emailService.loadAllTemplatesToLocalStorage(); }
-		 */
+		pingClamAv();
 		Log.platform.info("StartupValidations done!");
 	}
 
 	private void clearInitialCaches() {
-		try {
-			/*cacheManager.getCacheNames().parallelStream().filter(name -> cacheManager.getCache(name) != null)
-					.peek(cache -> Log.platform.warn("Clearing cache {} ", cache)).forEach(cache -> {
-						cacheManager.getCache(cache).clear();
-					});*/
-			redisTemplate.delete(redisTemplate.keys("*"));
-		} catch (IllegalArgumentException e) {
-			Log.platform.error("Exception while cleaning cache {}", e);
+		if(cacheEnabled) {
+			try {
+				/*cacheManager.getCacheNames().parallelStream().filter(name -> cacheManager.getCache(name) != null)
+						.peek(cache -> Log.platform.warn("Clearing cache {} ", cache)).forEach(cache -> {
+							cacheManager.getCache(cache).clear();
+						});*/
+				redisTemplate.delete(redisTemplate.keys("*"));
+			} catch (IllegalArgumentException e) {
+				Log.platform.error("Exception while cleaning cache {}", e);
+			}
+		}
+	}
+	
+	private void pingClamAv() {
+		if(clamAvEnabled) {
+			Log.platform.info("ClamAV Antivirus scan is enabled");
+			clamAvService.ping();
 		}
 	}
 

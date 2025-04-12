@@ -50,9 +50,9 @@ public class BasicUtil {
 
 	public static Pageable getPageable(String sortBy, String sortOrder, int pageNumber, int pageSize) {
 		String sortByField = StringUtils.isAllBlank(sortBy) ? BaseEntity.KEY_TIMEUPDATED : sortBy;
-		String sortDir = StringUtils.isAllBlank(sortOrder) ? "ASC" : sortOrder;
-		Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortByField).ascending()
-				: Sort.by(sortByField).descending();
+		String sortDir = StringUtils.isAllBlank(sortOrder) ? "DESC" : sortOrder;
+		Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortByField).descending()
+				: Sort.by(sortByField).ascending();
 		Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 		return pageable;
 	}

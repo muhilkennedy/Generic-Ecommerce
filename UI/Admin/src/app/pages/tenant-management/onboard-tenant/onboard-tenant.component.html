@@ -1,13 +1,14 @@
 <p-toast />
-<ngx-spinner/>
+<!-- <ngx-spinner/> -->
+ <loader/>
 <p-fluid>
     <div class="flex mt-8">
         <div class="card flex flex-col gap-6 w-full">
             <div class="font-semibold text-xl"><b>{{'Onboard New Tenant' | translate}}</b></div>
 
-            <p-stepper [(value)]="activeStep"> <!-- class="basis-[40rem]" -->
+            <p-stepper [(value)]="activeStep" [linear]="true"> <!-- class="basis-[40rem]" -->
                 <p-step-list>
-                    <p-step [value]="1" class="flex flex-row flex-auto gap-2" [disabled]="true">
+                    <p-step [value]="1" class="flex flex-row flex-auto gap-2">
                         <ng-template #content let-activateCallback="activateCallback" let-value="value">
                             <button class="bg-transparent border-0 inline-flex flex-col gap-2"
                                 (click)="activateCallback()">
@@ -21,7 +22,7 @@
                         </ng-template>
                     </p-step>
 
-                    <p-step [value]="2" class="flex flex-row flex-auto gap-2" [disabled]="true">
+                    <p-step [value]="2" class="flex flex-row flex-auto gap-2">
                         <ng-template #content let-activateCallback="activateCallback" let-value="value">
                             <button class="bg-transparent border-0 inline-flex flex-col gap-2"
                                 (click)="activateCallback()">
@@ -49,7 +50,7 @@
                         </ng-template>
                     </p-step>
 
-                    <p-step [value]="4" class="flex flex-row flex-auto gap-2" [disabled]="true">
+                    <p-step [value]="4" class="flex flex-row flex-auto gap-2">
                         <ng-template #content let-activateCallback="activateCallback" let-value="value">
                             <button class="bg-transparent border-0 inline-flex flex-col gap-2"
                                 (click)="activateCallback()">
@@ -69,7 +70,7 @@
                     <p-step-panel [value]="1">
                         <ng-template #content let-activateCallback="activateCallback">
                             <div class="flex flex-col gap-2 mx-auto" [formGroup]="detailsFormGroup">
-                                <div class="text-center mt-4 mb-4 text-xl font-semibold">{{'Enter Tenant Details'}}</div>
+                                <div class="text-center mt-4 mb-4 text-xl font-semibold">{{'Enter Tenant Details' | translate}}</div>
                                 <div class="flex flex-col md:flex-row gap-6">
                                     <div class="gap-2 w-full">
                                         <p-floatlabel variant="on">
@@ -152,7 +153,8 @@
                                     </div>
                                     <div class="gap-2 w-full">
                                         <p-floatlabel class="w-full" variant="on">
-                                            <p-select inputId="locale" [options]="locales" styleClass="w-full" formControlName="locale" [class]="getErrorClassIfPresent(detailsFormGroup, 'locale')"/>
+                                            <p-select inputId="locale" [options]="locales" optionLabel="name" optionValue="code" styleClass="w-full"
+                                             formControlName="locale" [class]="getErrorClassIfPresent(detailsFormGroup, 'locale')"/>
                                             <label for="locale">{{'Locale' | translate}}</label>
                                             <small class="p-error" *ngIf="hasError(detailsFormGroup, 'locale')" style="color: red;">{{'Locale is required' | translate}}</small>
                                         </p-floatlabel>
@@ -186,7 +188,7 @@
                                 <div class="text-center mt-4 mb-4 text-xl font-semibold">{{'Upload Tenant Logo' | translate}}</div>
                                 <div class="flex flex-wrap justify-center gap-4">
                                     <p-fileupload name="file" (onSelect)="onSelect($event)" (onUpload)="onUpload($event)" (onClear)="onRemove()" 
-                                                  [multiple]="false" accept="image/*" maxFileSize="1000000" mode="advanced" [url]="getUploadUrl()">
+                                                  [multiple]="true"  maxFileSize="1000000" mode="advanced" [url]="getUploadUrl()" (onError)="uploadError($event)">
                                         <ng-template #empty>
                                             <div> {{ 'Drag and drop files to here to upload.' |translate }}</div>
                                         </ng-template>

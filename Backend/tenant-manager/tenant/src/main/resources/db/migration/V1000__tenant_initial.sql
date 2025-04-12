@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS tenant (
     modifiedby BIGINT DEFAULT 0, 
     createdby BIGINT DEFAULT 0, 
     version BIGINT DEFAULT 0, 
-    locale VARCHAR(12) DEFAULT 'en_US', 
+    locale VARCHAR(12) DEFAULT 'en', 
     timezone VARCHAR(32) DEFAULT 'IST', 
     name VARCHAR(50) NOT NULL, 
     uniquename VARCHAR(50) NOT NULL UNIQUE, 

@@ -97,16 +97,14 @@ public class TenantDaoService implements BaseDaoService {
 		return subscriptionRepository.save(sub);
 	}
 
-	public List<Long> findTenantsToActivate() {
-		Date date = new Date();
-		String dt = PlatformUtil.SIMPLE_DATE_ONLY_FORMAT.format(date.getTime());
-		return subscriptionRepository.findTS(dt);
+	public List<Long> findTenantsIdsToDeactivate() {
+		String endDate = PlatformUtil.SIMPLE_DATE_ONLY_FORMAT.format(new Date().getTime());
+		return subscriptionRepository.findExpireTS(endDate);
 	}
-
-	public List<Long> findTenantsToDeactivate() {
-		Date date = new Date();
-		String dt = PlatformUtil.SIMPLE_DATE_ONLY_FORMAT.format(date.getTime());
-		return subscriptionRepository.findExpireTS(dt);
+	
+	public List<Long> findTenantsIdsToActivate(){
+		String startDate = PlatformUtil.SIMPLE_DATE_ONLY_FORMAT.format(new Date().getTime());
+		return subscriptionRepository.findActvateTS(startDate);
 	}
 
 	public List<TenantSubscription> findAllSubcriptions() {
@@ -120,5 +118,6 @@ public class TenantDaoService implements BaseDaoService {
 	public Integer getAllTenantsFromTimeCount(Long time) {
 	    return tenantRepository.findTenantsCountFromTime(time);
 	}
+
 
 }

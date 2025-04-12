@@ -1,0 +1,18 @@
+# Use an official ClamAV image or a minimal base
+FROM alpine:latest
+
+# Install ClamAV
+RUN apk add --no-cache clamav clamav-daemon
+
+# Create necessary directories and set permissions
+RUN mkdir -p /run/clamav && \
+    chown clamav:clamav /run/clamav
+
+# Update ClamAV virus database
+RUN freshclam
+
+# Expose ClamAV port (if needed)
+EXPOSE 3310
+
+# Start ClamAV daemon
+CMD ["clamd", "-F"]

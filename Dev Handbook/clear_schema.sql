@@ -1,10 +1,4 @@
--- SCHEMA: public
-
--- DROP SCHEMA IF EXISTS public ;
-
-CREATE SCHEMA IF NOT EXISTS public
-    AUTHORIZATION postgres;
-
-GRANT ALL ON SCHEMA public TO PUBLIC;
-
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
 GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO public;

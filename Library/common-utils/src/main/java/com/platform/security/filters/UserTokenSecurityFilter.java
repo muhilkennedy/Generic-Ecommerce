@@ -1,4 +1,4 @@
-package com.user.security;
+package com.platform.security.filters;
 
 import java.io.IOException;
 
@@ -9,11 +9,13 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
+import com.platform.entity.BaseEntity;
+import com.platform.entity.BaseLocale;
+import com.platform.logging.Log;
 import com.platform.server.BaseSession;
+import com.platform.service.BaseService;
 import com.platform.util.JWTUtil;
 import com.platform.util.LocaleUtil;
-import com.user.entity.User;
-import com.user.service.UserService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.Filter;
@@ -29,12 +31,12 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  */
 @Component
-@Order(2)
+@Order(3)
 public class UserTokenSecurityFilter implements Filter {
 
 	@Autowired
 	@Qualifier("EmployeeService")
-	private UserService employeeService;
+	private BaseService employeeService;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -45,25 +47,36 @@ public class UserTokenSecurityFilter implements Filter {
 		if (StringUtils.isNotBlank(token)) {
 			String jwtToken = JWTUtil.extractToken(token);
 			if (StringUtils.isNotBlank(jwtToken)) {
+				BaseSession.setJwttoken(jwtToken);
 				try {
 					if (JWTUtil.validateToken(jwtToken)) {
 						String userRootId = JWTUtil.getUserIdFromToken(jwtToken);
 						if (JWTUtil.isEmployeeUser(jwtToken)) {
-							User user = (User) employeeService.findById(Long.valueOf(userRootId));
+							BaseEntity user = employeeService.findById(Long.valueOf(userRootId));
 							String tokenUserUniqueName = JWTUtil.getUserUniqueNameFromToken(jwtToken);
 							String tokenIpAddress = JWTUtil.getIpAddressFromToken(jwtToken);
-							if (user == null || !user.getUniquename().equals(tokenUserUniqueName)
-									|| !httpRequest.getRemoteAddr().equals(tokenIpAddress)) {
+							if (user == null || !user.getUniqueName().equals(tokenUserUniqueName)) {
+								Log.user.error("Invalid user in token : {} : user : {}", BaseSession.getTenantUniqueName(), user.getUniqueName());
 								httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, LocaleUtil
 										.getLocalisedString("user.invalidAccess"));
 								return;
-							} else if (!user.isActive()) { 
+							}
+							else if((!httpRequest.getRemoteAddr().equals(tokenIpAddress) && !BaseSession.isRquestFromTrustedSubnet())) {
+								Log.user.error("Invalid ip in token : {} : ip : {}", BaseSession.getTenantUniqueName(), httpRequest.getRemoteAddr());
+								httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, LocaleUtil
+										.getLocalisedString("user.invalidIP"));
+								return;
+							}
+							else if (!user.isActive()) {
+								Log.user.error("Inactive user : {} : {}", BaseSession.getTenantUniqueName(), user.getUniqueName());
 								httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN,
 										LocaleUtil.getLocalisedString("user.inactive"));
 								return;
 							}
 							BaseSession.setUser(user);
-							BaseSession.setLocale(user.getLocale());
+							if (user instanceof BaseLocale userLocale) {
+								BaseSession.setLocale(userLocale.getLocale());
+							}
 							chain.doFilter(request, response);
 						} else {
 							// implement customer user logic here
@@ -71,16 +84,19 @@ public class UserTokenSecurityFilter implements Filter {
 							return;
 						}
 					} else {
+						Log.user.error("Invalid user token : {} ", BaseSession.getTenantUniqueName());
 						httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 								LocaleUtil.getLocalisedString("user.validationFailed"));
 						return;
 					}
 				} catch (ExpiredJwtException ex) {
+					Log.user.error("Exception parsing user token : {} : {}", BaseSession.getTenantUniqueName(), ex);
 					httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 							LocaleUtil.getLocalisedString("user.tokenExpired"));
 					return;
 				}
 			} else {
+				Log.user.error("User token missing : {}", BaseSession.getTenantUniqueName());
 				httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
 						LocaleUtil.getLocalisedString("user.tokenMissing"));
 				return;
