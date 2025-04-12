@@ -26,7 +26,7 @@ public class MultiTenantEntity extends BaseEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_TENANTID = "tenantid";
 
-	@GenericField
+	@GenericField(name = "tenantid")
 	@Column(name = "TENANTID", updatable = false, nullable = false)
 	private Long tenantid;
 

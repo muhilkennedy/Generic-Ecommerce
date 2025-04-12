@@ -12,19 +12,20 @@ export class ToastMessageService {
 
   showErrorMessage(message: string, title?: string): void;
   showErrorMessage(message: string, title?: string, sticky?: boolean): void;
-  showErrorMessage(message: string, title?: string, sticky?: boolean) {
+  // Lets stick error messages by default
+  showErrorMessage(message: string, title?: string, sticky: boolean = true) {
     this.messageService.add(
       {
         severity: "error",
-        detail: message,
+        detail: this.translate.instant(message),
         summary: CommonUtil.isNullOrEmptyOrUndefined(title) ? this.translate.instant("Error") : title,
-        sticky: CommonUtil.isNullOrEmptyOrUndefined(title) ? false : sticky,
+        sticky: sticky,
       });
   }
 
-  showPermanentErrorMessage(message: string): void;
-  showPermanentErrorMessage(message: string, title?: string){
-    return this.showErrorMessage(message, title, true);
+  showTempErrorMessage(message: string): void;
+  showTempErrorMessage(message: string, title?: string){
+    return this.showErrorMessage(message, title, false);
   };
 
   showWarningMessage(message: string, title?: string): void;
@@ -33,9 +34,9 @@ export class ToastMessageService {
     this.messageService.add(
       {
         severity: "warn",
-        detail: message,
+        detail: this.translate.instant(message),
         summary: CommonUtil.isNullOrEmptyOrUndefined(title) ? this.translate.instant("Warning") : title,
-        sticky: CommonUtil.isNullOrEmptyOrUndefined(title) ? false : sticky,
+        sticky: CommonUtil.isNullOrEmptyOrUndefined(sticky) ? false : sticky,
       });
   }
 
@@ -45,9 +46,9 @@ export class ToastMessageService {
     this.messageService.add(
       {
         severity: "success",
-        detail: message,
+        detail: this.translate.instant(message),
         summary: CommonUtil.isNullOrEmptyOrUndefined(title) ? this.translate.instant("Success") : title,
-        sticky: CommonUtil.isNullOrEmptyOrUndefined(title) ? false : sticky,
+        sticky: CommonUtil.isNullOrEmptyOrUndefined(sticky) ? false : sticky,
       });
   }
 
@@ -57,9 +58,9 @@ export class ToastMessageService {
     this.messageService.add(
       {
         severity: "info",
-        detail: message,
+        detail: this.translate.instant(message),
         summary: CommonUtil.isNullOrEmptyOrUndefined(title) ? this.translate.instant("Info") : title,
-        sticky: CommonUtil.isNullOrEmptyOrUndefined(title) ? false : sticky,
+        sticky: CommonUtil.isNullOrEmptyOrUndefined(sticky) ? false : sticky,
       });
   }
 

@@ -1,5 +1,5 @@
 /* Common Audit table */
-CREATE TABLE IF NOT EXISTS audit (
+CREATE TABLE IF NOT EXISTS auditlog (
     rootid BIGSERIAL PRIMARY KEY,
     tenantid BIGINT NOT NULL,
     timecreated BIGINT DEFAULT 0,
@@ -8,7 +8,9 @@ CREATE TABLE IF NOT EXISTS audit (
     modifiedby BIGINT DEFAULT 0,
     createdby BIGINT DEFAULT 0,
     version BIGINT DEFAULT 0,
-    auditid VARCHAR(64) UNIQUE,
+    auditid VARCHAR(128) UNIQUE,
     message VARCHAR(2048),
-    operation VARCHAR(32)
+    operation VARCHAR(32),
+    affectedentity VARCHAR(64),
+    affectedrootid BIGINT DEFAULT 0
 );

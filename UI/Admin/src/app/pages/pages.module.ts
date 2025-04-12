@@ -11,6 +11,7 @@ import { NgxSpinnerModule } from "ngx-spinner";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AppModule } from '../../app.module';
+import { SpinnerComponent } from './shared/spinner';
 
 @NgModule({
   declarations:[
@@ -26,7 +27,8 @@ import { AppModule } from '../../app.module';
     TableModule,
     ToastModule,
     BrowserAnimationsModule,
-    NgxSpinnerModule.forRoot()
+    NgxSpinnerModule.forRoot(),
+    SpinnerComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [

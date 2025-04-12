@@ -48,12 +48,6 @@ public class EmployeeRole extends MultiTenantEntity {
 		this.employeeid = employee.getRootid();
 		this.roleid = role.getRootid();
 	}
-	
-    public EmployeeRole(Long employeeId, Long roleId) {
-        super();
-        this.employeeid = employeeId;
-        this.roleid = roleId;
-    }
 
 	public Employee getEmployee() {
 		return employee;

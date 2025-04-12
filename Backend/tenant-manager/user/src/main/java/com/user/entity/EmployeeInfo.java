@@ -1,5 +1,7 @@
 package com.user.entity;
 
+import java.sql.Date;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.annotations.ClassMetaProperty;
 import com.platform.entity.MultiTenantEntity;
@@ -23,7 +25,7 @@ public class EmployeeInfo extends MultiTenantEntity {
 
 	//@PIIData(allowedRolePermissions = {Permissions.ADMIN, Permissions.MANAGE_USERS})
 	@Column(name = "DOB")
-	private String dob;
+	private Date dob;
 
 	@Column(name = "GENDER")
 	private String gender;
@@ -39,12 +41,20 @@ public class EmployeeInfo extends MultiTenantEntity {
 	@JoinColumn(name = "EMPLOYEEID", referencedColumnName = "ROOTID", nullable = false, updatable = false)
 	private Employee employee;
 
-	public String getDob() {
+	public Date getDob() {
 		return dob;
 	}
 
-	public void setDob(String dob) {
+	public void setDob(Date dob) {
 		this.dob = dob;
+	}
+
+	public Long getProofblobid() {
+		return proofblobid;
+	}
+
+	public void setProofblobid(Long proofblobid) {
+		this.proofblobid = proofblobid;
 	}
 
 	public String getGender() {

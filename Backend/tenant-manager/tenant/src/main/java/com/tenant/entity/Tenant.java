@@ -2,6 +2,8 @@ package com.tenant.entity;
 
 import java.io.Serializable;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+
 import com.platform.annotations.ClassMetaProperty;
 import com.platform.entity.BaseEntity;
 
@@ -9,6 +11,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -19,6 +23,8 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "TENANT")
 @ClassMetaProperty(code = "REALM")
+@Indexed(index = "tenant_index")
+@NamedEntityGraph(name = "Tenant.detail", attributeNodes = { @NamedAttributeNode("tenantDetail") })
 public class Tenant extends BaseEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

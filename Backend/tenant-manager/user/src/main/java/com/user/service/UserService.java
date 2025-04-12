@@ -2,6 +2,7 @@ package com.user.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import com.platform.service.BaseService;
 import com.user.entity.User;
@@ -37,5 +38,7 @@ public interface UserService extends BaseService {
 	default User updateSecondaryEmail(String email) {
 		return null;
 	}
+
+	List<User> searchByName(String keyword);
 
 }

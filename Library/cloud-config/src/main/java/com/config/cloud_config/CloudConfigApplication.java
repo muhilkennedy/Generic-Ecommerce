@@ -9,6 +9,7 @@ import org.springframework.cloud.config.server.EnableConfigServer;
  */
 @SpringBootApplication
 @EnableConfigServer
+//TODO: implement subnet filter.
 public class CloudConfigApplication {
 
 	public static void main(String[] args) {

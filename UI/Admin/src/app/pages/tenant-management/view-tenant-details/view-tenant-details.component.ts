@@ -12,11 +12,12 @@ import { InputIcon, InputIconModule } from 'primeng/inputicon';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { TenantService } from '../../../service/tenant/tenant.service';
 import { ToastMessageService } from '../../../service/toastmessage/toast-message.service';
+import { SpinnerComponent } from '../../shared/spinner';
 
 @Component({
   selector: 'app-view-tenant-details',
   imports: [ButtonModule, FormsModule, ReactiveFormsModule, InputGroupModule, FloatLabelModule, InputGroupAddon,
-            TranslateModule, NgxSpinnerModule, FluidModule, InputTextModule, InputIconModule],
+            TranslateModule, NgxSpinnerModule, FluidModule, InputTextModule, InputIconModule, SpinnerComponent],
   templateUrl: './view-tenant-details.component.html',
   styleUrl: './view-tenant-details.component.scss'
 })

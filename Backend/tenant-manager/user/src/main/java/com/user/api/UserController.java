@@ -42,5 +42,6 @@ public class UserController {
 						JWTUtil.USER_TYPE_EMPLOYEE, httpRequest.getRemoteAddr(), user.isRememberMe()));
 		return loggedUser;
 	}
+	
 
 }

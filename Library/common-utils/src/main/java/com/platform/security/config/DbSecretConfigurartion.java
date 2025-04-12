@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "encryption.db")
 public class DbSecretConfigurartion {
 	
-	private String secret;
+	private String secret; // 32 bytes
 	private String initVector;
 
 	public String getSecret() {

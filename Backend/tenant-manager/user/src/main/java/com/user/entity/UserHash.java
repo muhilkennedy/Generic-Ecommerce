@@ -2,8 +2,6 @@ package com.user.entity;
 
 import java.security.NoSuchAlgorithmException;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-
 import com.platform.annotations.ClassMetaProperty;
 import com.platform.entity.MultiTenantEntity;
 import com.platform.util.EncryptionUtil;
@@ -20,7 +18,6 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "USERHASH")
 @ClassMetaProperty(code = "USRHSH")
-@Indexed(index = "userhash_index")
 public class UserHash extends MultiTenantEntity {
 
 	private static final long serialVersionUID = -816554745702148307L;
@@ -30,6 +27,9 @@ public class UserHash extends MultiTenantEntity {
 	
 	@Column(name = "MOBILE")
 	private String mobile;
+	
+	@Column(name = "EMAIL")
+	private String email;
 
 	public String getMobile() {
 		return mobile;
@@ -48,9 +48,26 @@ public class UserHash extends MultiTenantEntity {
 		this.uniquename = uniqueName;
 	}
 
+	public String getUniquename() {
+		return uniquename;
+	}
+
+	public void setUniquename(String uniquename) {
+		this.uniquename = uniquename;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	@PrePersist
 	public void updateMobileHash() throws NoSuchAlgorithmException {
 		setMobile(EncryptionUtil.hash_SHA256(mobile));
+		setEmail(EncryptionUtil.hash_SHA256(email));
 	}
 
 }

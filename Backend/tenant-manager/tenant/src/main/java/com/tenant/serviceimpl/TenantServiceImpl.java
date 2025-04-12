@@ -3,6 +3,7 @@ package com.tenant.serviceimpl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -10,6 +11,7 @@ import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ import com.tenant.service.TenantService;
  */
 @Service
 @Qualifier("TenantService")
+@Primary
 public class TenantServiceImpl implements TenantService {
 	
 	@Autowired
@@ -65,6 +68,7 @@ public class TenantServiceImpl implements TenantService {
 	@Autowired
 	EmailService emailService;
 	
+	@Override
 	public Tenant createTenant(TenantRequest tenantRequest) {
 		Tenant tenant = new Tenant();
 		tenant.setName(tenantRequest.getName());
@@ -87,6 +91,7 @@ public class TenantServiceImpl implements TenantService {
 		return tenant;
 	}
 
+	@Override
 	public TenantDetails UpdateTenantDetails(TenantRequest tenantRequest) {
 		TenantDetails details = new TenantDetails();
 		details.setBusinessemail(tenantRequest.getBusinessEmail());
@@ -115,6 +120,7 @@ public class TenantServiceImpl implements TenantService {
 		return details;
 	}
 	
+	@Override
 	public TenantSubscription updateTenantSubscription(TenantSubscriptionRequest subscriptionRequest) {
 		TenantSubscription subscription = new TenantSubscription();
 		subscription.setStartdate(subscriptionRequest.getStartDate());
@@ -122,10 +128,12 @@ public class TenantServiceImpl implements TenantService {
 		return daoService.saveTenantSubscription(subscription);
 	}
 
+	@Override
 	public List<TenantSubscription> getTenantSubscriptionHistory() {
 		return daoService.findAllSubcriptions();
 	}
 	
+	@Override
 	public Tenant updateTenant (Long tenantId, TenantRequest tenantRequest) {
 	    Tenant tenant = (Tenant)findById(tenantId);
 	    if(StringUtils.isNotEmpty(tenantRequest.getLocale())) {
@@ -134,6 +142,7 @@ public class TenantServiceImpl implements TenantService {
 	    return (Tenant)daoService.save(tenant);
 	}
 	
+	@Override
 	public TenantWidgetResponse getTenantsCountForDashBoard() {
 	    TenantWidgetResponse resp = new TenantWidgetResponse();
 	    resp.setTotalTenants(daoService.getAllTenantsCount());
@@ -141,6 +150,22 @@ public class TenantServiceImpl implements TenantService {
 	    calendar.add(Calendar.DAY_OF_MONTH, -7);
 	    resp.setRecentTenants(daoService.getAllTenantsFromTimeCount(calendar.getTime().getTime()));
 	    return resp;
+	}
+	
+	public void validateTenantSubscription() {
+		Tenant tenant = (Tenant) BaseSession.getTenant();
+		List<TenantSubscription> subscriptions = getTenantSubscriptionHistory();
+		subscriptions.stream().filter(subscription -> subscription.isActive()).forEach(subscription -> {
+			if(subscription.getEnddate().after(new Date())) {
+				
+			}
+			if(subscription.getStartdate().after(new Date())) {
+				subscription.setActive(true);
+				tenant.setActive(true);
+			}
+			daoService.saveTenantSubscription(subscription);
+			daoService.save(tenant);
+		});
 	}
 
 }

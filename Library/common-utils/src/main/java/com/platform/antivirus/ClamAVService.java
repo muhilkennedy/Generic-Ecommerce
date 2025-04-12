@@ -41,9 +41,9 @@ public class ClamAVService {
 		if (antivirusConfiguration.isEnabled()) {
 			try {
 				if (processCommand("zPING\0".getBytes()).trim().equalsIgnoreCase(PONG)) {
-					Log.platform.warn("ClamAv is reachable!");
+					Log.platform.warn("ClamAv service is reachable!");
 				} else {
-					Log.platform.error("ClamAv is un-reachable!");
+					Log.platform.error("ClamAv service is un-reachable!");
 				}
 			} catch (Exception e) {
 				Log.platform.error("Error pinging to ClamAV {}", e);

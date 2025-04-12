@@ -21,6 +21,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.InvalidKeyException;
 import io.jsonwebtoken.security.Keys;
 
+/**
+ * @author Muhil
+ */
 @Component
 public class JWTUtil {
 
@@ -32,6 +35,7 @@ public class JWTUtil {
 	private static final String CLAIM_USER_TYPE = "UserType";
 	private static final String IP_ADDRESS = "IPAddress";
 	private static final String UNIQUE_NAME = "UniqueName";
+	private static final String SERVICE_NAME = "Service";
 	public static final String USER_TYPE_EMPLOYEE = "Employee";
 	public static final String USER_TYPE_CUSTOMER = "Customer";
 	
@@ -156,7 +160,7 @@ public class JWTUtil {
 	}
 
 	public static String extractToken(String token) {
-		return token.replace("Bearer", "").trim();
+		return token.replace(PlatformUtil.TOKEN_BEARER, "").trim();
 	}
 
 }

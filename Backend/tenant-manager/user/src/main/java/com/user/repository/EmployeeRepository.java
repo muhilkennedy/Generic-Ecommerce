@@ -1,5 +1,6 @@
 package com.user.repository;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,6 +16,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 	
 	String findByEmailQuery = "select emp from Employee emp where emailid=:emailId";
 
+	@EntityGraph(value = "Employee.detail", type = EntityGraph.EntityGraphType.LOAD)
 	@Query(findByEmailQuery)
 	Employee findByEmailId(@Param("emailId") String emailId);
 	
@@ -25,17 +27,20 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
 	String findByUniqueNameQuery = "select emp from Employee emp where uniquename=:uniqueName";
 
+	@EntityGraph(value = "Employee.detail", type = EntityGraph.EntityGraphType.LOAD)
 	@Query(findByUniqueNameQuery)
 	Employee findByUniqueName(@Param("uniqueName") String uniqueName);
 	
 	String findByEmailOrMobileQuery = "select emp from Employee emp where emailid=:emailId";
 
+	@EntityGraph(value = "Employee.detail", type = EntityGraph.EntityGraphType.LOAD)
 	@Query(findByEmailOrMobileQuery)
 	Employee findByEmailOrMobile(@Param("emailId") String emailId, @Param("mobile") String mobile);
 	
-	String findEmployeeForLoginQuery = "select emp from Employee emp inner join UserHash uh on emp.uniquename=uh.uniquename where emp.emailid = :emailId or uh.mobile = :mobileHash";
+	String findEmployeeForLoginQuery = "select emp from Employee emp inner join UserHash uh on emp.uniquename=uh.uniquename where uh.email = :emailOrMobile or uh.mobile = :emailOrMobile";
 	
-	@Query(findByEmailOrMobileQuery)
-	Employee findEmployeeForLogin(@Param("emailId") String emailId, @Param("mobileHash") String mobile);
+	@EntityGraph(value = "Employee.detail", type = EntityGraph.EntityGraphType.LOAD)
+	@Query(findEmployeeForLoginQuery)
+	Employee findEmployeeForLogin(@Param("emailOrMobile") String emailOrMobileHash);
 
 }

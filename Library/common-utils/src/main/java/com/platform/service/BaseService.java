@@ -25,4 +25,8 @@ public interface BaseService {
 		return null;
 	};
 	
+	default BaseEntity refreshEntity(Long rootid) {
+		return findById(rootid);
+	}
+	
 }

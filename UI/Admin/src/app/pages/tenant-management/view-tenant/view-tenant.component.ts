@@ -25,12 +25,13 @@ import { DialogService, DynamicDialogModule, DynamicDialogRef } from 'primeng/dy
 import { DialogFooter } from '../../../layout/shared/dialog.footer';
 import { ViewTenantDetailsComponent } from '../view-tenant-details/view-tenant-details.component';
 import { CommonUtil } from '../../../util/CommonUtil.service';
+import { SpinnerComponent } from "../../shared/spinner";
 
 @Component({
   selector: 'app-view-tenant',
   imports: [TableModule, ButtonModule, CommonModule, ToastModule, FluidModule, ReactiveFormsModule, TranslateModule, InputTextModule, DialogModule, DynamicDialogModule,
     FloatLabelModule, KnobModule, NgxSpinnerModule, IconFieldModule, InputIconModule, ProgressBarModule, TagModule, FormsModule, RatingModule,
-    InputGroupModule, ToggleButtonModule],
+    InputGroupModule, ToggleButtonModule, SpinnerComponent],
   templateUrl: './view-tenant.component.html',
   styleUrl: './view-tenant.component.scss'
 })

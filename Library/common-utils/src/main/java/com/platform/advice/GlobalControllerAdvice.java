@@ -1,6 +1,8 @@
 package com.platform.advice;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -10,8 +12,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.platform.exceptions.CustomBaseException;
+import com.platform.logging.AuditOperation;
 import com.platform.logging.Log;
 import com.platform.messages.ErrorResponse;
+import com.platform.server.BaseSession;
+import com.platform.service.AuditService;
 
 /**
  * @author Muhil Kennedy 
@@ -21,8 +27,8 @@ import com.platform.messages.ErrorResponse;
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
 
-//	@Autowired
-//	private AuditService auditService;
+	@Autowired
+	private AuditService auditService;
 
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	public ResponseEntity<ErrorResponse> handleSQLIntegrityException(DataIntegrityViolationException ex) {
@@ -30,8 +36,7 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
 				"Oops! There is a data conflict! Please try again!"); // TODO: Localize
 		Log.platform.error(errorResponse.toString());
 		logger.error("SQLIntegrityConstraintViolationException :: Exception :: ", ex);
-		// auditService.logAuditInfo(AuditOperation.ERROR,
-		// ExceptionUtils.getStackTrace(ex), errorResponse.getErrorCode());
+		auditService.logAudit(BaseSession.getTenant(), BaseSession.getUser(), ExceptionUtils.getStackTrace(ex), AuditOperation.API_RESPONSE, ex);
 		return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.CONFLICT);
 	}
 
@@ -40,8 +45,13 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
 		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), extractMessage(ex));
 		Log.platform.error(errorResponse.toString());
 		logger.error("handleGenericException :: Exception :: {}", ex);
-		// auditService.logAuditInfo(AuditOperation.ERROR,
-		// ExceptionUtils.getStackTrace(ex), errorResponse.getErrorCode());
+		if (ex instanceof CustomBaseException cbe) {
+			auditService.logAudit(BaseSession.getTenant(), BaseSession.getUser(), ExceptionUtils.getStackTrace(ex),
+					AuditOperation.API_RESPONSE, ex, cbe.getErrorCode());
+		} else {
+			auditService.logAudit(BaseSession.getTenant(), BaseSession.getUser(), ExceptionUtils.getStackTrace(ex),
+					AuditOperation.API_RESPONSE, ex);
+		}
 		return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 

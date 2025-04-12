@@ -20,6 +20,8 @@ import com.user.repository.RolesRepository;
 import com.user.service.EmployeeRolesService;
 import com.user.service.EmployeeService;
 
+import jakarta.transaction.Transactional;
+
 /**
  * @author muhil
  */
@@ -74,34 +76,34 @@ public class EmployeeRolesServiceImpl implements EmployeeRolesService {
     }
 
 	@Override
+	@Transactional
     public Employee addRoleToEmployee (Long empId, List<Long> roleIds)
     {
         Employee employee = (Employee)employeeService.findById(empId);
         if (employee == null) {
             throw new UsernameNotFoundException("User not found");
         }
+        //clear all existing roles and update.
+        employee.getEmployeeRoles().forEach(er -> employeeRoleRepository.delete(er));
         List<EmployeeRole> er = roleIds.stream().map(
-            id -> employeeRoleRepository.save(
-                new EmployeeRole(employee.getRootid(), id))).toList();
+            id -> new EmployeeRole(employee, rolesRepository.findById(id).get())).toList();
         return employeeService.updateEmployeeRoles(employee, er);
     }
     
 	@Override
-    public Employee removeRolesForEmployee (Long empId, List<Long> roleIds)
-    {
-        Employee employee = (Employee)employeeService.findById(empId);
-        if (employee == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        List<EmployeeRole> erList = employee.getEmployeeRoles();
-        erList.stream().filter(er -> roleIds.contains(er.getRoleid())).forEach(
-            er -> employeeRoleRepository.delete(er));
-        // set remaining active roles bac to employee object for cache save to
-        // take effect
-        employee.setEmployeeRoles(
-            erList.stream().filter(er -> !roleIds.contains(er.getRoleid())).toList());
-        return employeeService.updateEmployeeRoles(employee, erList);
-    }
+	
+	public Employee removeRolesForEmployee(Long empId, List<Long> roleIds) {
+		Employee employee = (Employee) employeeService.findById(empId);
+		if (employee == null) {
+			throw new UsernameNotFoundException("User not found");
+		}
+		List<EmployeeRole> erList = employee.getEmployeeRoles();
+		erList.stream().filter(er -> roleIds.contains(er.getRole().getRootid()))
+				.forEach(er -> employeeRoleRepository.delete(er));
+		// set remaining active roles back to employee object for cache save to take effect
+		return employeeService.updateEmployeeRoles(employee,
+				erList.stream().filter(er -> !roleIds.contains(er.getRole().getRootid())).toList());
+	}
 	
     @Override
     public List<Role> getAllAvailableRoles ()

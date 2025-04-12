@@ -56,6 +56,7 @@ export class TenantinitalizerService {
             console.error('Error loading tenant details:', error);
             resolve(false);
             this.router.navigate(['/auth/error']);
+            this.spinner.hide();
           },
           complete: () => console.log('App initialization complete.')
         });
@@ -85,6 +86,7 @@ async function loadUser(cookieService: CookieService, router: Router, employeeSe
           },
           error: (error: any) => {
             console.log(error);
+            cookieService.deleteAll();
             router.navigate(['/login']);
             isUserLoaded = true;
           }

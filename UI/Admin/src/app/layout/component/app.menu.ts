@@ -7,6 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Permissions } from '../../model/permissions';
 import { EmployeeDataService } from '../../service/shared/employee/employee-data.service';
 import { CommonUtil } from '../../util/CommonUtil.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
     selector: 'app-menu',
@@ -23,15 +24,16 @@ export class AppMenu {
     //model: MenuItem[] = [];
     model: any[] = [];
 
-    // attributes: {
-    //     "Permission" : Permissions.MANAGE_USERS
-    //   }
-
-    constructor(private translate: TranslateService, private userData: EmployeeDataService, private router: Router) {
-        //this.translate.setDefaultLang('en');
+    constructor(private translate: TranslateService, private userData: EmployeeDataService, private router: Router,
+                private cookieService: CookieService) {
+       
     }
 
     ngOnInit() {
+        if(CommonUtil.isNullOrEmptyOrUndefined(this.cookieService.get(CommonUtil.KEY_TOKEN))) {
+            this.router.navigate(['/login']);
+            return;        
+        }
         this.model = [
             {
                 label: this.translate.instant('Home'),
@@ -43,7 +45,7 @@ export class AppMenu {
                 items: [
                     { label: this.translate.instant('View Tenant'), icon: 'pi pi-fw pi-list', routerLink: ['/pages/view-tenant'] },
                     { label: this.translate.instant('Onboard Tenant'), icon: 'pi pi-fw pi-plus', routerLink: ['/pages/onboard-tenant'] },
-                    { label: this.translate.instant('Edit Tenant'), icon: 'pi pi-fw pi-pencil', routerLink: ['/uikit/formlayout'] }
+                    // { label: this.translate.instant('Edit Tenant'), icon: 'pi pi-fw pi-pencil', routerLink: ['/uikit/formlayout'] }
                 ]
             },
             {
@@ -59,12 +61,12 @@ export class AppMenu {
                             {
                                 label: this.translate.instant('View'),
                                 icon: 'pi pi-fw pi-list',
-                                routerLink: ['/auth/access']
+                                routerLink: ['/pages/view-employees']
                             },
                             {
                                 label: this.translate.instant('Onboard'),
                                 icon: 'pi pi-fw pi-user-plus',
-                                routerLink: ['/auth/login'],
+                                routerLink: ['/pages/onboard-employee'],
                                 Permission : [ Permissions.EDIT_USERS ],
                             },
                             {
@@ -78,13 +80,13 @@ export class AppMenu {
                                 icon: 'pi pi-fw pi-key',
                                 items: [
                                     {
-                                        label: this.translate.instant('View'),
+                                        label: this.translate.instant('Assign'),
                                         icon: 'pi pi-fw pi-list-check',
                                         routerLink: ['/auth/login'],
-                                        Permission : [ Permissions.MANAGE_USERS ],
+                                        Permission : [ Permissions.EDIT_USERS ],
                                     },
                                     {
-                                        label: this.translate.instant('Edit'),
+                                        label: this.translate.instant('Roles'),
                                         icon: 'pi pi-fw pi-pencil',
                                         routerLink: ['/auth/error'],
                                         Permission : [ Permissions.ADMIN ],
@@ -258,6 +260,7 @@ export class AppMenu {
 
         if(CommonUtil.isNullOrEmptyOrUndefined(this.userData.getCurrentEmployeeUser())){
             this.router.navigate(['/login']);
+            return;
         }
 
         // Incase of super user we render all menu items

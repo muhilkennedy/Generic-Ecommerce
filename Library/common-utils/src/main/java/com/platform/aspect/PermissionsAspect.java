@@ -46,6 +46,9 @@ public class PermissionsAspect {
 		// validate for permissions only if present in annotation.
 		if (permissions.length > 0) {
 			BasePermission user = (BasePermission) BaseSession.getUser(); // since employee entity implements basepermission
+			if(user == null) {
+				throw new InvalidUserPermission("Session user not set! Please Consider adding @ValidateUserToken.");
+			}
 			if (user.getUserPermissions().isEmpty()) {
 				Log.user.debug(
 						"Seems like user dont have any permissions setup! consider adding roles/permissions before accessing endpoints {}");

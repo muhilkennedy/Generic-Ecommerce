@@ -76,9 +76,7 @@ public class EmployeeDaoService implements BaseDaoService {
 	}
 	
 	public Employee findUserForLogin(User user) throws NoSuchAlgorithmException {
-		return empRepository.findEmployeeForLogin(user.getEmailid(),
-				StringUtils.isAllEmpty(user.getMobile()) ? PlatformUtil.EMPTY_STRING
-						: EncryptionUtil.hash_SHA256(user.getMobile()));
+		return empRepository.findEmployeeForLogin(EncryptionUtil.hash_SHA256(user.getEmailid()));
 	}
 
 }

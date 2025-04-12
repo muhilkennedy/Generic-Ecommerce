@@ -17,6 +17,9 @@ public class BaseSession {
 	private static final ThreadLocal<BaseEntity> currentTenant = new ThreadLocal<>();// identifies tenant session owner
 	private static final ThreadLocal<BaseEntity> user = new ThreadLocal<>();
 	private static final ThreadLocal<Locale> locale = new ThreadLocal<>();
+	private static final ThreadLocal<Boolean> isFromtrustedSubnet = new ThreadLocal<>();
+	private static final ThreadLocal<String> jwtToken = new ThreadLocal<>();
+	private static final ThreadLocal<String> tenantUniqueName = new ThreadLocal<>();
 
 	public static void setTenant(BaseEntity tnt) {
 		tenant.set(tnt);
@@ -42,10 +45,13 @@ public class BaseSession {
 	public static Long getUserId() {
 		return user.get().getRootid();
 	}
-
+	
+	public static void SetTenantUniqueName(String uniqueName) {
+		tenantUniqueName.set(uniqueName);
+	}
 
 	public static String getTenantUniqueName() {
-		return tenant.get() != null ? tenant.get().getUniqueName() : PlatformUtil.EMPTY_STRING;
+		return tenantUniqueName.get() != null ? tenantUniqueName.get() : PlatformUtil.EMPTY_STRING;
 	}
 
 	public static void setUser(BaseEntity usr) {
@@ -67,12 +73,31 @@ public class BaseSession {
 	public static Locale getLocale() {
 		return locale.get();
 	}
+	
+	public static void setRequestFromTrustedSubnet(boolean isFromTrustedSubnet) {
+		isFromtrustedSubnet.set(isFromTrustedSubnet);
+	}
+	
+	public static Boolean isRquestFromTrustedSubnet() {
+		return isFromtrustedSubnet.get();
+	}
+
+	public static String getJwttoken() {
+		return jwtToken.get();
+	}
+	
+	public static void setJwttoken(String token) {
+		jwtToken.set(token);
+	}
 
 	public static void tearDownSession() {
 		tenant.remove();
 		user.remove();
 		locale.remove();
 		currentTenant.remove();
+		isFromtrustedSubnet.remove();
+		jwtToken.remove();
+		tenantUniqueName.remove();
 	}
 
 	public static void setupSession(Long tenantId, Long userId) {
@@ -82,6 +107,11 @@ public class BaseSession {
 		ent = new BaseEntity();
 		ent.setRootid(userId);
 		setUser(ent);
+	}
+	
+	public static void setupSession(BaseEntity tenant, BaseEntity user) {
+		setCurrentTenant(tenant);
+		setUser(user);
 	}
 
 }
