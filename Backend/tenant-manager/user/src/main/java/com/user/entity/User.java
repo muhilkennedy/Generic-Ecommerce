@@ -43,7 +43,7 @@ public class User extends MultiTenantEntity implements BaseLocale {
 	@GenericField(name = "fname", sortable = Sortable.YES, searchable = Searchable.YES)
 	@Column(name = "FNAME")
 	private String fname;
-	
+
 	@GenericField(name = "lname", sortable = Sortable.YES, searchable = Searchable.YES)
 	@Column(name = "LNAME")
 	private String lname;

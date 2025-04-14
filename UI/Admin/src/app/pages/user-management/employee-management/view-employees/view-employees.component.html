@@ -14,14 +14,14 @@
             </ng-template>
     
             <ng-template #end>
-                <p-button label="Export" icon="pi pi-upload" severity="secondary" />
+                <p-button [label]="'Export' | translate" icon="pi pi-upload" severity="secondary" />
             </ng-template>
         </p-toolbar>
         <p-table #dt1 [value]="employees" dataKey="rootid" [rows]="pageSize" [rowsPerPageOptions]="[10, 25, 50]" [loading]="tableLoading" [rowHover]="true"
                         [paginator]="true" [totalRecords]="totalRecords" (onLazyLoad)="loadEmployeesLazy($event)"  [lazy]="true"
-                        [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                        [showCurrentPageReport]="true" [currentPageReportTemplate]="'Showing {first} to {last} of {totalRecords} entries' | translate"
                         [(selection)]="selectedEmployees"
-                        [globalFilterFields]="['fname', 'lname', 'emailid', 'status', 'mobile']">
+                        [globalFilterFields]="['fname', 'lname', 'email', 'status', 'mobile']">
            <ng-template #caption>
                <div class="flex">
                    <p-button [label]="'Clear Filters' | translate" [outlined]="true" icon="pi pi-filter-slash" (click)="clear(dt1)" />
@@ -29,7 +29,7 @@
                        <p-inputicon>
                            <i class="pi pi-search"></i>
                        </p-inputicon>
-                       <input pInputText type="text" (input)="applyGlobalFilter(getGlobalFilterValue($event), dt1)" placeholder="Search keyword" />
+                       <input pInputText type="text" (input)="applyGlobalFilter(getGlobalFilterValue($event), dt1)" [placeholder]="'Search keyword' | translate" />
                    </p-iconfield>
                </div>
            </ng-template>
@@ -144,7 +144,7 @@
                         {{ employee.designation }}
                    </td>
                    <td>
-                    <p-tag styleClass="pointer" [value]="employee.active? 'Active' : 'Inactive'" 
+                    <p-tag styleClass="pointer" [value]="employee.active? ('Active' | translate) : ('Inactive' | translate)" 
                         [severity]="employee.active? 'success' : 'danger'" (click)="toggleEmployeeStatus(); employee.active = !employee.active" />
                    </td>
                    <td>

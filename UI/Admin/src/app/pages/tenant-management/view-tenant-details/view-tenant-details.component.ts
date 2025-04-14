@@ -13,6 +13,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { TenantService } from '../../../service/tenant/tenant.service';
 import { ToastMessageService } from '../../../service/toastmessage/toast-message.service';
 import { SpinnerComponent } from '../../shared/spinner';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-view-tenant-details',
@@ -39,7 +40,12 @@ export class ViewTenantDetailsComponent {
     let body = {
       locale: this.tenant.locale
     };
-    this.tenantService.updateTenant(this.tenant.rootid, body).subscribe({
+    this.tenantService.updateTenant(this.tenant.rootid, body).pipe(
+      finalize(() => {
+        this.spinner.hide();
+      })
+    )
+    .subscribe({
       next: (response) => {
         this.messageSerivce.showSuccessMessage("Tenant locale updated successfully!");
       },

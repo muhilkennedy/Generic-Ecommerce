@@ -27,9 +27,6 @@ import jakarta.annotation.PostConstruct;
  */
 @Configuration
 public class StartupValidations {
-
-	@Autowired
-	private CacheManager cacheManager;
 	
 	@Autowired
 	private StringRedisTemplate redisTemplate;

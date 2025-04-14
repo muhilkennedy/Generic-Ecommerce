@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.platform.exceptions.CustomBaseException;
+import com.platform.exceptions.CustomBaseRuntimeException;
 import com.platform.logging.AuditOperation;
 import com.platform.logging.Log;
 import com.platform.messages.ErrorResponse;
@@ -36,21 +37,33 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
 				"Oops! There is a data conflict! Please try again!"); // TODO: Localize
 		Log.platform.error(errorResponse.toString());
 		logger.error("SQLIntegrityConstraintViolationException :: Exception :: ", ex);
-		auditService.logAudit(BaseSession.getTenant(), BaseSession.getUser(), ExceptionUtils.getStackTrace(ex), AuditOperation.API_RESPONSE, ex);
+		auditService.logAudit(BaseSession.getTenant(), BaseSession.getUser(), ExceptionUtils.getStackTrace(ex), AuditOperation.API_RESPONSE, ex, errorResponse.getErrorCode());
 		return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.CONFLICT);
 	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), extractMessage(ex));
-		Log.platform.error(errorResponse.toString());
-		logger.error("handleGenericException :: Exception :: {}", ex);
+		ErrorResponse errorResponse = null;
 		if (ex instanceof CustomBaseException cbe) {
+			errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), extractMessage(ex),
+					cbe.getErrorCode());
+			Log.platform.error(errorResponse.toString());
+			logger.error("handleGenericException :: CustomBaseException :: {}", ex);
 			auditService.logAudit(BaseSession.getTenant(), BaseSession.getUser(), ExceptionUtils.getStackTrace(ex),
 					AuditOperation.API_RESPONSE, ex, cbe.getErrorCode());
-		} else {
+		} else if (ex instanceof CustomBaseRuntimeException cbre) {
+			errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), extractMessage(ex),
+					cbre.getErrorCode());
+			Log.platform.error(errorResponse.toString());
+			logger.error("handleGenericException :: CustomBaseRuntimeException :: {}", ex);
 			auditService.logAudit(BaseSession.getTenant(), BaseSession.getUser(), ExceptionUtils.getStackTrace(ex),
-					AuditOperation.API_RESPONSE, ex);
+					AuditOperation.API_RESPONSE, ex, cbre.getErrorCode());
+		} else {
+			errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), extractMessage(ex));
+			Log.platform.error(errorResponse.toString());
+			logger.error("handleGenericException :: Exception :: {}", ex);
+			auditService.logAudit(BaseSession.getTenant(), BaseSession.getUser(), ExceptionUtils.getStackTrace(ex),
+					AuditOperation.API_RESPONSE, ex, errorResponse.getErrorCode());
 		}
 		return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}

@@ -1,28 +1,18 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectItem, SelectModule } from 'primeng/select';
+import { SelectModule } from 'primeng/select';
 import { FluidModule } from 'primeng/fluid';
-import { TextareaModule } from 'primeng/textarea';
-import { InputMaskModule } from 'primeng/inputmask';
-import { StepperModule } from 'primeng/stepper'
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { TranslateModule } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { ToastModule } from 'primeng/toast';
-import { FileUploadModule } from 'primeng/fileupload';
-import { FilterMatchMode, MessageService } from 'primeng/api';
-import { DatePicker } from 'primeng/datepicker';
+import { FilterMatchMode } from 'primeng/api';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { SpinnerComponent } from '../../../shared/spinner';
-import { PasswordModule } from 'primeng/password';
-import { AutoCompleteModule } from 'primeng/autocomplete';
 import { CommonUtil } from '../../../../util/CommonUtil.service';
-import { RadioButtonModule } from 'primeng/radiobutton';
 import { ToggleButtonModule } from 'primeng/togglebutton';
-import { Role } from '../../../../model/role';
 import { Employee } from '../../../../model/employee';
 import { EmployeeService } from '../../../../service/employee/employee.service';
 import { ToastMessageService } from '../../../../service/toastmessage/toast-message.service';
@@ -41,23 +31,26 @@ import { AvatarModule } from 'primeng/avatar';
 import { ToolbarModule } from 'primeng/toolbar';
 import { OnboardEmployeesComponent } from "../onboard-employees/onboard-employees.component";
 import { SearchDTO } from '../../../../model/searchDTO';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-view-employees',
   imports: [TableModule, ButtonModule, CommonModule, ToastModule, FluidModule, FormsModule, ReactiveFormsModule, TranslateModule, InputTextModule, DialogModule, DynamicDialogModule,
-    FloatLabelModule, KnobModule, NgxSpinnerModule, IconFieldModule, InputIconModule, ProgressBarModule, TagModule, FormsModule, RatingModule,
+    FloatLabelModule, KnobModule, NgxSpinnerModule, IconFieldModule, InputIconModule, ProgressBarModule, TagModule, RatingModule,
     InputGroupModule, ToggleButtonModule, SpinnerComponent, SliderModule, SelectModule, AvatarModule, ToolbarModule, OnboardEmployeesComponent],
   templateUrl: './view-employees.component.html',
   styleUrl: './view-employees.component.scss'
 })
 export class ViewEmployeesComponent {
 
-  constructor(private employeeService: EmployeeService, private messageService: ToastMessageService, private spinner: NgxSpinnerService) { }
+  constructor(private employeeService: EmployeeService, private messageService: ToastMessageService, private spinner: NgxSpinnerService,
+              private translate: TranslateService
+  ) { }
 
   employees!: Employee[];
   cachedEmployees!: Employee[];
   selectedEmployees!: Employee[];
-  statuses: any[] = ['Active', 'Inactive'];
+  statuses: any[] = [];
   tableLoading: boolean = false;
   totalRecords!: number;
   pageSize: number = 10;
@@ -77,8 +70,9 @@ export class ViewEmployeesComponent {
 
   ngOnInit() {
     this.mobileFilterMatchModes = [
-      { label: 'Equals', value: FilterMatchMode.EQUALS }
-  ];
+      { label: this.translate.instant('equals'), value: FilterMatchMode.EQUALS }
+    ];
+  this.statuses = [ this.translate.instant('Active'), this.translate.instant('Inactive')];
   }
 
   clear(table: Table) {
@@ -122,7 +116,12 @@ export class ViewEmployeesComponent {
     });
 
     if(body.length > 0){
-      this.employeeService.filterAllEmployees(this.pageSize, this.pageNumber + 1, this.sortField, this.sortOrder, body).subscribe({
+      this.employeeService.filterAllEmployees(this.pageSize, this.pageNumber + 1, this.sortField, this.sortOrder, body).pipe(
+        finalize(() => {
+          this.spinner.hide();
+        })
+      )
+      .subscribe({
         next: (response: any) => {
           this.employees = response.data.content;
           this.cachedEmployees = response.data.content.slice(); // creates a shallow copy of the array
@@ -137,7 +136,12 @@ export class ViewEmployeesComponent {
       });
     }
     else{
-      this.employeeService.getAllEmployees(this.pageSize, this.pageNumber, this.sortField, this.sortOrder).subscribe({
+      this.employeeService.getAllEmployees(this.pageSize, this.pageNumber, this.sortField, this.sortOrder).pipe(
+        finalize(() => {
+          this.spinner.hide();
+        })
+      )
+      .subscribe({
         next: (response: any) => {
           this.employees = response.data.content;
           this.cachedEmployees = response.data.content.slice();

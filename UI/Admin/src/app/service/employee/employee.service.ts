@@ -19,7 +19,7 @@ export class EmployeeService {
       "emailid": email,
       "password": password
     },
-    { observe: 'response' })
+      { observe: 'response' })
   }
 
   getAllRoles(): Observable<any> {
@@ -44,6 +44,40 @@ export class EmployeeService {
 
   filterAllEmployees(pageSize: number, pageNumber: number, sortField: string, sortOrder: string, body: any): Observable<any> {
     return this.http.post(`${environment.apiUrl}/tm/employee/search/filter?pageNumber=${pageNumber}&pageSize=${pageSize}&sortBy=${sortField}&sortOrder=${sortOrder}`, body);
+  }
+
+  getAllPermissions(): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/tm/role/permissions`);
+  }
+
+  addPermissionToRole(body: any): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/tm/role/permission`, body);
+  }
+
+  removePermissionFromRole(body: any): Observable<any> {
+    return this.http.delete(`${environment.apiUrl}/tm/role/permission`, {
+      body: body
+    });
+  }
+
+  addAllPermissionsToRole(body: any): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/tm/role/permission/all`, body);
+  }
+
+  removeAllPermissionsToRole(body: any): Observable<any> {
+    return this.http.delete(`${environment.apiUrl}/tm/role/permission/all`, {
+      body: body
+    });
+  }
+
+  createNewRole(roleName: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/tm/role`, {
+      name: roleName
+    });
+  }
+
+  getEmployeeRoles(employeeId: number): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/tm/role/employee/${employeeId}`);
   }
 
 }

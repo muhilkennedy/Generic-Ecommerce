@@ -42,5 +42,15 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 	@EntityGraph(value = "Employee.detail", type = EntityGraph.EntityGraphType.LOAD)
 	@Query(findEmployeeForLoginQuery)
 	Employee findEmployeeForLogin(@Param("emailOrMobile") String emailOrMobileHash);
+	
+    String getEmployeesCountQuery = "select count(*) from Employee";
+
+    @Query(value = getEmployeesCountQuery, nativeQuery = true)
+    Integer getEmployeesCount();
+    
+    String getEmployeeCountFromTimeQuery = "select count(*) from Employee where timecreated >= :timecreated";
+
+    @Query(value = getEmployeeCountFromTimeQuery, nativeQuery = true)
+    Integer getEmployeeCountFromTime(@Param("timecreated") Long timeCreated);
 
 }

@@ -10,6 +10,7 @@ import { EmployeeDataService } from '../shared/employee/employee-data.service';
 import { CommonUtil } from '../../util/CommonUtil.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { PrimeNG } from 'primeng/config';
+import { finalize } from 'rxjs';
 
 var isLocaleLoaded: boolean = false;
 var isUserLoaded: boolean = false;
@@ -36,6 +37,11 @@ export class TenantinitalizerService {
     this.spinner.show();
     return new Promise((resolve, reject) => {
       this.http.get(`${environment.apiUrl}/tm/ping`)
+        .pipe(
+          finalize(() => {
+            this.spinner.hide();
+          })
+        )
         .subscribe({
           next: (resp: any) => {
             console.log('Tenant details loaded:', resp);

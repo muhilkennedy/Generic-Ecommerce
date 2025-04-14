@@ -2,7 +2,7 @@ package com.user.service;
 
 import java.util.List;
 
-import org.hibernate.search.engine.search.query.SearchResult;
+import org.springframework.data.domain.Page;
 
 import com.platform.model.SearchFilterDTO;
 import com.user.entity.Employee;
@@ -18,7 +18,7 @@ public interface EmployeeService extends UserService {
 
 	Employee createEmployee(EmployeeRequest request);
 
-	SearchResult<?> searchEmployeesBasedonFilters(List<SearchFilterDTO> filters, int pageSize, int pageNumber,
+	Page<?> searchEmployeesBasedonFilters(List<SearchFilterDTO> filters, int pageSize, int pageNumber,
 			String sortFiled, String sortOrder);
 
 }
