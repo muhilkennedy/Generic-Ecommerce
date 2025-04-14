@@ -9,7 +9,7 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { StepperModule } from 'primeng/stepper'
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { TranslateModule } from '@ngx-translate/core';
-import { HttpClient } from '@angular/common/http';
+import { finalize } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ToastModule } from 'primeng/toast';
 import { FileUploadModule } from 'primeng/fileupload';
@@ -84,7 +84,12 @@ export class OnboardEmployeesComponent {
   loadRoles() {
     if (this.roles.length === 0) {
       this.spinner.show();
-      this.employeeService.getAllRoles().subscribe({
+      this.employeeService.getAllRoles().pipe(
+      finalize(() => {
+        this.spinner.hide();
+      })
+    )
+    .subscribe({
         next: (response: any) => {
           this.roles = response.dataList;
           this.roles.forEach((role: Role) => {
@@ -93,9 +98,6 @@ export class OnboardEmployeesComponent {
         },
         error: (error: any) => {
           this.messageService.showErrorMessage('Failed to load roles');
-        },
-        complete: () => {
-          this.spinner.hide();
         }
       });
     }
@@ -110,8 +112,12 @@ export class OnboardEmployeesComponent {
   }
 
   filterEmployees(event: any) {
-
-    this.employeeService.searchEmployeesByName(event.query).subscribe({
+    this.employeeService.searchEmployeesByName(event.query).pipe(
+      finalize(() => {
+        this.spinner.hide();
+      })
+    )
+    .subscribe({
       next: (response: any) => {
         this.filteredEmployees = response.dataList;
         this.filteredEmployees.forEach((employee: any) => {
@@ -145,16 +151,20 @@ export class OnboardEmployeesComponent {
       switchMap((resp: any) => {
         return this.employeeService.assignRolesToEmployee(resp.data.rootid, selectedRoles);
       })
-    ).subscribe({
-      next: (resp: any) => {
-        this.employee = resp.data;
-        this.messageService.showSuccessMessage('Employee Onboarded Successfully');
-      },
-      error: (err: any) => {
-        this.messageService.showErrorMessage('Error while onboarding employee');
-      },
-      complete: () => { this.spinner.hide(); }
-    })
+      ).pipe(
+        finalize(() => {
+          this.spinner.hide();
+        })
+      )
+      .subscribe({
+        next: (resp: any) => {
+          this.employee = resp.data;
+          this.messageService.showSuccessMessage('Employee Onboarded Successfully');
+        },
+        error: (err: any) => {
+          this.messageService.showErrorMessage('Error while onboarding employee');
+        }
+      })
   }
 
   canSaveEmployee() {

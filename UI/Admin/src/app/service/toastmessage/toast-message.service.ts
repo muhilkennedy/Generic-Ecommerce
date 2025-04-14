@@ -17,14 +17,31 @@ export class ToastMessageService {
     this.messageService.add(
       {
         severity: "error",
-        detail: this.translate.instant(message),
+        detail: message,
         summary: CommonUtil.isNullOrEmptyOrUndefined(title) ? this.translate.instant("Error") : title,
         sticky: sticky,
       });
   }
 
+  showError(errorObj: any) {
+    if(CommonUtil.isNullOrEmptyOrUndefined(errorObj.error))
+    {
+      this.showErrorMessage(errorObj.message);
+    }
+    else{
+      this.messageService.add(
+        {
+          severity: "error",
+          detail: errorObj.error.message,
+          summary: CommonUtil.isNullOrEmptyOrUndefined(errorObj.error.errorCode) ? 
+                    this.translate.instant("Error") + " : " + errorObj.error.status : errorObj.error.errorCode,
+          sticky: true,
+        });
+    }
+  }
+
   showTempErrorMessage(message: string): void;
-  showTempErrorMessage(message: string, title?: string){
+  showTempErrorMessage(message: string, title?: string) {
     return this.showErrorMessage(message, title, false);
   };
 

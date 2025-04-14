@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { ButtonModule } from 'primeng/button';
-import { DatePicker } from 'primeng/datepicker';
+import { finalize } from 'rxjs';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { FluidModule } from 'primeng/fluid';
 import { TableModule, TableRowCollapseEvent, TableRowExpandEvent } from 'primeng/table';
@@ -55,7 +55,12 @@ export class ViewTenantComponent {
 
   ngOnInit() {
     this.spinner.show();
-    this.tenantService.getAllTenants().subscribe({
+    this.tenantService.getAllTenants().pipe(
+      finalize(() => {
+        this.spinner.hide();
+      })
+    )
+    .subscribe({
       next: (response: any) => {
         this.tenants = response.dataList;
         this.spinner.hide();
@@ -142,7 +147,12 @@ export class ViewTenantComponent {
 
   loadTenantSubscriptions(tenantId: number) {
     this.spinner.show();
-    this.tenantService.getTenantSubscriptions(tenantId).subscribe({
+    this.tenantService.getTenantSubscriptions(tenantId).pipe(
+      finalize(() => {
+        this.spinner.hide();
+      })
+    )
+    .subscribe({
       next: (response: any) => {
         this.tenantSubscriptions = response.dataList;
       },

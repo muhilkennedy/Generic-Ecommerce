@@ -3,13 +3,19 @@ package com.user.serviceimpl;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,7 +25,9 @@ import com.platform.hibernate.search.HibernateSearchService;
 import com.platform.logging.Log;
 import com.platform.model.SearchFilterDTO;
 import com.platform.social.LoginTypes;
+import com.platform.util.EncryptionUtil;
 import com.platform.util.SecurityUtil;
+import com.tenant.model.TenantWidgetResponse;
 import com.user.dao.EmployeeDaoService;
 import com.user.dao.UserHashDaoService;
 import com.user.entity.Employee;
@@ -29,6 +37,7 @@ import com.user.entity.User;
 import com.user.entity.UserHash;
 import com.user.exceptions.UserException;
 import com.user.model.EmployeeRequest;
+import com.user.model.EmployeeWidgetResponse;
 import com.user.service.EmployeeService;
 
 import jakarta.transaction.Transactional;
@@ -52,6 +61,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	
 	@Autowired
 	private HibernateSearchService hibernateSearch;
+	
+	private final List<String> userHashFields = Arrays.asList("email", "mobile");
 
 	@Override
 	public BaseEntity findById(Long rootId) {
@@ -189,20 +200,40 @@ public class EmployeeServiceImpl implements EmployeeService {
 		
 	}
 	
-//	@Override
-	public User updatePermissions() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public EmployeeWidgetResponse getUsersCountForDashBoard() {
+		EmployeeWidgetResponse resp = new EmployeeWidgetResponse();
+	    resp.setTotalEmployees(employeeDaoService.getAllEmployeesCount());
+	    Calendar calendar = Calendar.getInstance();
+	    calendar.add(Calendar.DAY_OF_MONTH, -7);
+	    resp.setRecentEmployees(employeeDaoService.getAllEmployeesCreatedFromDate(calendar.getTime().getTime()));
+	    return resp;
 	}
-	
+
 	@Override
 	public List<User> searchByName(String keyword) {
 		return (List<User>) hibernateSearch.search(Employee.class, keyword, Employee.KEY_FNAME, Employee.KEY_LNAME);
 	}
 	
 	@Override
-	public SearchResult<?> searchEmployeesBasedonFilters(List<SearchFilterDTO> filters, int pageSize, int pageNumber, String sortFiled, String sortOrder) {
-		return hibernateSearch.advancedSearch(Employee.class, filters, pageSize, pageNumber, sortFiled, sortOrder);
+	public Page<?> searchEmployeesBasedonFilters(List<SearchFilterDTO> filters, int pageSize, int pageNumber,
+			String sortFiled, String sortOrder) {
+		filters.parallelStream().filter(filter -> userHashFields.contains(filter.getField())).forEach(filter -> {
+			try {
+				filter.setValue(EncryptionUtil.hash_SHA256(filter.getValue().toString()));
+			} catch (NoSuchAlgorithmException e) {
+				Log.user.error("Filter manipulation error: {}", e);
+			}
+		});
+		SearchResult result = hibernateSearch.advancedSearch(List.of(Employee.class, UserHash.class), filters, pageSize,
+				pageNumber, sortFiled, sortOrder);
+		List<Employee> empList = result.hits().parallelStream().map(hit -> {
+			if (hit instanceof UserHash uh) {
+				return employeeDaoService.findByUniqueName(uh.getUniqueName());
+			}
+			return hit;
+		}).filter(Objects::nonNull).toList();
+		return new PageImpl<Employee>(empList, PageRequest.ofSize(pageSize), result.total().hitCount());
 	}
 	
 

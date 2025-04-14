@@ -1,0 +1,5 @@
+# Use an official ClamAV image or a minimal base
+FROM alpine:latest
+
+# Install NFS
+sudo apt install nfs-kernel-server krb5-kdc krb5-admin-server -y

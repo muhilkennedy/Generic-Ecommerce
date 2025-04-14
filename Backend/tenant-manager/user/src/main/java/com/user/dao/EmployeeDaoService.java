@@ -2,7 +2,6 @@ package com.user.dao;
 
 import java.security.NoSuchAlgorithmException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import com.platform.entity.BaseEntity;
 import com.platform.service.BaseDaoService;
 import com.platform.util.EncryptionUtil;
-import com.platform.util.PlatformUtil;
 import com.user.entity.Employee;
 import com.user.entity.User;
 import com.user.repository.EmployeeRepository;
@@ -24,8 +22,8 @@ import com.user.repository.EmployeeRepository;
  */
 @Service
 public class EmployeeDaoService implements BaseDaoService {
-	
-	private static final String EMPLOYEE_CACHE_NAME = "employee";
+
+	public static final String EMPLOYEE_CACHE_NAME = "employee";
 
 	@Autowired
 	private EmployeeRepository empRepository;
@@ -43,7 +41,7 @@ public class EmployeeDaoService implements BaseDaoService {
 	}
 
 	@Override
-	@Cacheable(value = EMPLOYEE_CACHE_NAME, key = "#rootId", unless="#result == null")
+	@Cacheable(value = EMPLOYEE_CACHE_NAME, key = "#rootId", unless = "#result == null")
 	public BaseEntity findById(Long rootId) {
 		return empRepository.findById(rootId).get();
 	}
@@ -65,18 +63,26 @@ public class EmployeeDaoService implements BaseDaoService {
 		empRepository.deleteById(rootId);
 	}
 
-	@Cacheable(value = EMPLOYEE_CACHE_NAME, key = "#uniqueName", unless="#result == null")
+	@Cacheable(value = EMPLOYEE_CACHE_NAME, key = "#uniqueName", unless = "#result == null")
 	public Employee findByUniqueName(String uniqueName) {
 		return empRepository.findByUniqueName(uniqueName);
 	}
-	
-	@Cacheable(value = EMPLOYEE_CACHE_NAME, key = "#emailId", unless="#result == null")
+
+	@Cacheable(value = EMPLOYEE_CACHE_NAME, key = "#emailId", unless = "#result == null")
 	public Employee findByEmailId(String emailId) {
 		return empRepository.findByEmailId(emailId);
 	}
-	
+
 	public Employee findUserForLogin(User user) throws NoSuchAlgorithmException {
 		return empRepository.findEmployeeForLogin(EncryptionUtil.hash_SHA256(user.getEmailid()));
+	}
+	
+	public int getAllEmployeesCount() {
+		return empRepository.getEmployeesCount();
+	}
+	
+	public int getAllEmployeesCreatedFromDate(Long time) {
+		return empRepository.getEmployeeCountFromTime(time);
 	}
 
 }

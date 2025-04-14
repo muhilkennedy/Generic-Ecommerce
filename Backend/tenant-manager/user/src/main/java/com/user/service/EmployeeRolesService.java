@@ -20,4 +20,12 @@ public interface EmployeeRolesService extends BaseService {
 
     List<Role> getEmployeeRoles (Long empId);
 
+	Role removePermissionsFromRole(Long roleId, List<String> permissionNames);
+
+	Role assignPermissionsToRole(Long roleId, List<String> permissionNames);
+
+	Role assignAllPermissionsToRole(Long roleId);
+
+	Role removeAllPermissionsToRole(Long roleId);
+
 }

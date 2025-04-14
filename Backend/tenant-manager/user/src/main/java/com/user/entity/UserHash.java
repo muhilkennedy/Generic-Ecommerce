@@ -2,6 +2,11 @@ package com.user.entity;
 
 import java.security.NoSuchAlgorithmException;
 
+import org.hibernate.search.engine.backend.types.Searchable;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+
 import com.platform.annotations.ClassMetaProperty;
 import com.platform.entity.MultiTenantEntity;
 import com.platform.util.EncryptionUtil;
@@ -18,6 +23,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "USERHASH")
 @ClassMetaProperty(code = "USRHSH")
+@Indexed(index = "userhash_index")
 public class UserHash extends MultiTenantEntity {
 
 	private static final long serialVersionUID = -816554745702148307L;
@@ -25,9 +31,11 @@ public class UserHash extends MultiTenantEntity {
 	@Column(name = "UNIQUENAME")
 	private String uniquename;
 	
+	@GenericField(name = "mobile", searchable = Searchable.YES)
 	@Column(name = "MOBILE")
 	private String mobile;
 	
+	@GenericField(name = "email", searchable = Searchable.YES)
 	@Column(name = "EMAIL")
 	private String email;
 

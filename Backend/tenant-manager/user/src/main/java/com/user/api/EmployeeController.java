@@ -3,13 +3,10 @@ package com.user.api;
 import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.search.engine.search.query.SearchResult;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -71,11 +68,8 @@ public class EmployeeController {
 			@RequestParam(value = "sortBy", defaultValue = "timecreated") String sortByField,
 			@RequestParam(value = "sortOrder", defaultValue = "ASC") String sortOrder)
 			throws SchedulerException, IOException {
-		SearchResult<?> result = empService.searchEmployeesBasedonFilters(filters, pageSize, pageNumber, sortByField,
-				sortOrder);
-		Page<Employee> page = new PageImpl<Employee>((List<Employee>) result.hits(),
-				PageRequest.ofSize(pageSize), result.total().hitCount());
-		return new GenericResponse<Page<?>>().setData(page);
+		return new GenericResponse<Page<?>>().setData(empService.searchEmployeesBasedonFilters(filters, pageSize, pageNumber, sortByField,
+				sortOrder));
 	}
 
 	@GetMapping("/all")

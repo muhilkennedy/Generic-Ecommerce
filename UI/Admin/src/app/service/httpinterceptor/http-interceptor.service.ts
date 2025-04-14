@@ -28,6 +28,7 @@ export class HttpInterceptorService implements HttpInterceptor {
         if (error.status === 401) {
           console.error('Unauthorized request - Redirecting to login');
           // Handle 401 error - Redirect to login page or refresh token
+          //this.message.showErrorMessage('Please Login Again!', 'Token Expired');
           this.cookieService.deleteAll();
           //return throwError(() => new Error('Unauthorized - 401'));
         }

@@ -34,4 +34,8 @@ export class TenantService {
     return this.http.get(`${environment.apiUrl}/tm/admin/tenant/all/count`);
   }
 
+  getDashBoardWidgets(): Observable<any>{
+    return this.http.get(`${environment.apiUrl}/tm/dashboard/widgets`);
+  }
+
 }

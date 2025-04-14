@@ -1,0 +1,18 @@
+# Use the official Vault image as the base
+FROM hashicorp/vault:latest
+
+# Set the Vault version (optional, can be specified at the time of build)
+ENV VAULT_VERSION=1.9.0
+
+# Add your custom Vault configuration file
+# Make sure you have vault.hcl file with appropriate configurations
+COPY vault.hcl /etc/vault.d/vault.hcl
+
+# Set the Vault config file environment variable
+ENV VAULT_CONFIG_FILE=/etc/vault.d/vault.hcl
+
+# Expose the Vault port (8200 is the default port)
+EXPOSE 8200
+
+# Command to run Vault in server mode with the specified config
+CMD ["vault", "server", "-config=/etc/vault.d/vault.hcl"]

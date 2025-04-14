@@ -15,13 +15,16 @@ import { EmployeeDataService } from '../../service/shared/employee/employee-data
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { SpinnerComponent } from "../shared/spinner";
 import { TranslateModule } from '@ngx-translate/core';
+import { ToastMessageService } from '../../service/toastmessage/toast-message.service';
+import { ToastModule } from 'primeng/toast';
+import { finalize } from 'rxjs';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator, NgxSpinnerModule, ReactiveFormsModule, SpinnerComponent, TranslateModule],
+    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator, NgxSpinnerModule, ReactiveFormsModule, SpinnerComponent, TranslateModule, ToastModule],
     template: `
-        <!-- <ngx-spinner type='ball-clip-rotate-multiple'></ngx-spinner> -->
+        <p-toast/>
         <loader/>
         <app-floating-configurator />
         <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
@@ -61,11 +64,16 @@ export class Login {
     checked: boolean = false;
 
     constructor(private employeeService: EmployeeService, private route: Router, private spinner: NgxSpinnerService,
-        private cookieService: CookieService, private employeeData: EmployeeDataService){}
+        private cookieService: CookieService, private employeeData: EmployeeDataService, private messageService: ToastMessageService){}
 
     login(){
         this.spinner.show();
         this.employeeService.login(this.email, this.password, this.checked)
+            .pipe(
+                finalize(() => {
+                    this.spinner.hide();
+                })
+            )
             .subscribe({
                 next: (resp: HttpResponse<any>) => {
                     this.cookieService.set(CommonUtil.KEY_TOKEN, resp.headers.get(CommonUtil.KEY_TOKEN)!);
@@ -74,6 +82,7 @@ export class Login {
                     this.route.navigate(['/dashboard']);
                 },
                 error: (err: any) => {
+                    this.messageService.showError(err);
                     this.spinner.hide();
                     this.route.navigate(['/auth/error']);
                 },

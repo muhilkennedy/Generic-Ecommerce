@@ -7,6 +7,7 @@ import java.util.List;
 import com.platform.service.BaseService;
 import com.user.entity.User;
 import com.user.exceptions.UserException;
+import com.user.model.EmployeeWidgetResponse;
 
 /**
  * @author muhil 
@@ -40,5 +41,7 @@ public interface UserService extends BaseService {
 	}
 
 	List<User> searchByName(String keyword);
+
+	EmployeeWidgetResponse getUsersCountForDashBoard();
 
 }

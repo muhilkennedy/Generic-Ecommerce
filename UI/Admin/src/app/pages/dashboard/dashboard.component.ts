@@ -12,10 +12,12 @@ import { Employee } from '../../model/employee';
 import { EmployeeService } from '../../service/employee/employee.service';
 import { EmployeeDataService } from '../../service/shared/employee/employee-data.service';
 import { SpinnerComponent } from "../shared/spinner";
+import { finalize } from 'rxjs';
+import { FluidModule } from 'primeng/fluid';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [NgxSpinnerModule, TranslateModule, ToastModule, SpinnerComponent],
+  imports: [NgxSpinnerModule, TranslateModule, ToastModule, SpinnerComponent, FluidModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -23,6 +25,8 @@ export class DashboardComponent {
 
   totalTenants: number = 0;
   recentTenants: number = 0;
+  recentEmployees: number = 0;
+  totalEmployees: number = 0;
 
   constructor(private spinner: NgxSpinnerService, private translate: TranslateService, private cookieService: CookieService,
               private messageService: ToastMessageService, private tenantService: TenantService, private router: Router,
@@ -34,16 +38,20 @@ export class DashboardComponent {
       return;        
     }
     this.spinner.show();
-    this.tenantService.getAllTenantsCountForDashboard().subscribe({
+    this.tenantService.getDashBoardWidgets().pipe(
+      finalize(() => {
+        this.spinner.hide();
+      })
+    )
+    .subscribe({
       next: (response: any) => {
-        this.totalTenants = response.data.totalTenants;
-        this.recentTenants = response.data.recentTenants;
+        this.totalTenants = response.data.tenantWidget.totalTenants;
+        this.recentTenants = response.data.tenantWidget.recentTenants;
+        this.totalEmployees = response.data.employeeWidget.totalEmployees;
+        this.recentEmployees = response.data.employeeWidget.recentEmployees;
       },
       error: (error) => {
         this.messageService.showErrorMessage("Failed to load Dashboard data.");
-        this.spinner.hide();
-      },
-      complete: () => {
         this.spinner.hide();
       }
     });

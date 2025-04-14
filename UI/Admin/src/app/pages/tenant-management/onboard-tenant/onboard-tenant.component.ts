@@ -22,6 +22,7 @@ import { ToastMessageService } from '../../../service/toastmessage/toast-message
 import { TenantService } from '../../../service/tenant/tenant.service';
 import { switchMap } from 'rxjs';
 import { SpinnerComponent } from '../../shared/spinner';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-onboard-tenant',
@@ -85,6 +86,11 @@ export class OnboardTenantComponent {
     if (!CommonUtil.isNullOrEmptyOrUndefined(pincode) && !pincode.includes("_")) {
       this.postalLoad = true;
       this.http.get(`${environment.apiUrl}/tm/common/pincode/${pincode}`)
+        .pipe(
+          finalize(() => {
+            this.spinner.hide();
+          })
+        )
         .subscribe({
           next: (resp: any) => {
             this.cities = resp.dataList[0].PostOffice;
@@ -166,6 +172,7 @@ export class OnboardTenantComponent {
             },
             error: (err: any) => {
               this.messageService.showErrorMessage('Error while onboarding tenant');
+              this.spinner.hide();
             },
             complete: () => { this.spinner.hide(); }
           }

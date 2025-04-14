@@ -82,13 +82,13 @@ export class AppMenu {
                                     {
                                         label: this.translate.instant('Assign'),
                                         icon: 'pi pi-fw pi-list-check',
-                                        routerLink: ['/auth/login'],
+                                        routerLink: ['/pages/assign-roles'],
                                         Permission : [ Permissions.EDIT_USERS ],
                                     },
                                     {
                                         label: this.translate.instant('Roles'),
                                         icon: 'pi pi-fw pi-pencil',
-                                        routerLink: ['/auth/error'],
+                                        routerLink: ['/pages/manage-roles'],
                                         Permission : [ Permissions.ADMIN ],
                                     }
                                 ]
