@@ -13,6 +13,9 @@ import { CookieService } from 'ngx-cookie-service';
 import { NgxSpinnerService, provideSpinnerConfig } from 'ngx-spinner';
 import { MessageService } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideMessaging, getMessaging } from '@angular/fire/messaging';
+import { environment } from './environments/environment';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -37,6 +40,8 @@ export const appConfig: ApplicationConfig = {
         provideSpinnerConfig({ type: 'ball-clip-rotate-multiple' }),
         NgxSpinnerService,
         MessageService,
-        DialogService
+        DialogService,
+        provideFirebaseApp(() => initializeApp(environment.firebase)),
+        provideMessaging(() => getMessaging())
     ]
 };

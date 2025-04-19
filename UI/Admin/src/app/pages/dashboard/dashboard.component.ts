@@ -14,10 +14,12 @@ import { EmployeeDataService } from '../../service/shared/employee/employee-data
 import { SpinnerComponent } from "../shared/spinner";
 import { finalize } from 'rxjs';
 import { FluidModule } from 'primeng/fluid';
+import { PushNotificationService } from '../../service/pushnotification/push-notification.service';
+import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [NgxSpinnerModule, TranslateModule, ToastModule, SpinnerComponent, FluidModule],
+  imports: [NgxSpinnerModule, TranslateModule, ToastModule, SpinnerComponent, FluidModule, AngularFireMessagingModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -30,7 +32,7 @@ export class DashboardComponent {
 
   constructor(private spinner: NgxSpinnerService, private translate: TranslateService, private cookieService: CookieService,
               private messageService: ToastMessageService, private tenantService: TenantService, private router: Router,
-              private employeeService: EmployeeService, private userData: EmployeeDataService,){}
+              private employeeService: EmployeeService, private userData: EmployeeDataService, private pushNotify: PushNotificationService){}
 
   ngOnInit(){
     if(CommonUtil.isNullOrEmptyOrUndefined(this.cookieService.get(CommonUtil.KEY_TOKEN))) {
@@ -49,6 +51,7 @@ export class DashboardComponent {
         this.recentTenants = response.data.tenantWidget.recentTenants;
         this.totalEmployees = response.data.employeeWidget.totalEmployees;
         this.recentEmployees = response.data.employeeWidget.recentEmployees;
+        this.pushNotify.requestPermission();
       },
       error: (error) => {
         this.messageService.showErrorMessage("Failed to load Dashboard data.");
