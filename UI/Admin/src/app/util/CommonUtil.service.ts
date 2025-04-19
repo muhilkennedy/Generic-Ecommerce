@@ -11,6 +11,9 @@ export class CommonUtil {
     static KEY_LOCALE = 'x-locale';
     static DATE_FORMAT_PLAIN = "dd/MM/yyyy";
 
+    static KEY_FCM_TOKEN = 'fcm-token'; // Firebase cloud messaging token
+    static KEY_NOTIFICATION_TYPE_EMPLOYEE = 'PN_EMPLOYEE';
+
     static states: string[] = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
         "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
         "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",

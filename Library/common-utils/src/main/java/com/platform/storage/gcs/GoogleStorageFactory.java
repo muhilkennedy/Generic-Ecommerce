@@ -15,10 +15,14 @@ import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.platform.logging.Log;
 import com.platform.server.BaseSession;
 
 import jakarta.annotation.PostConstruct;
 
+/**
+ * @author Muhil
+ */
 @Component
 @ConditionalOnProperty(prefix = "app.gcs", value = "enabled", havingValue = "true")
 public class GoogleStorageFactory {
@@ -39,7 +43,7 @@ public class GoogleStorageFactory {
 		this.storage = StorageOptions.newBuilder().setCredentials(credentials).setProjectId("default").build()
 				.getService();
 		this.bucketName = defaultConfig.getBucket();
-
+		Log.platform.info("---- Default GCS initialized ----");
 	}
 
 	public void updateTenantStorageConfig(Long tenantId, String gcpConfig, String gcpBucket) throws IOException {
@@ -61,7 +65,7 @@ public class GoogleStorageFactory {
 	}
 
 	public Storage storage() {
-		if (!tenantStorages.isEmpty()) {
+		if (!tenantStorages.isEmpty() && tenantStorages.get(BaseSession.getTenantId()) != null) {
 			return tenantStorages.get(BaseSession.getTenantId()).getStorage();
 		}
 		return storage;
