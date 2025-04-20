@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -23,11 +23,12 @@ import { TenantService } from '../../../service/tenant/tenant.service';
 import { switchMap } from 'rxjs';
 import { SpinnerComponent } from '../../shared/spinner';
 import { finalize } from 'rxjs';
+import { RecaptchaComponent } from "../../shared/recaptcha/recaptcha.component";
 
 @Component({
   selector: 'app-onboard-tenant',
   imports: [InputTextModule, ButtonModule, SelectModule, FormsModule, InputMaskModule, CommonModule, ToastModule, FileUploadModule,
-    FluidModule, TextareaModule, ReactiveFormsModule, TranslateModule, FloatLabelModule, StepperModule, DatePicker, NgxSpinnerModule, SpinnerComponent],
+    FluidModule, TextareaModule, ReactiveFormsModule, TranslateModule, FloatLabelModule, StepperModule, DatePicker, NgxSpinnerModule, SpinnerComponent, RecaptchaComponent],
   templateUrl: './onboard-tenant.component.html',
   styleUrl: './onboard-tenant.component.scss'
 })
@@ -48,6 +49,9 @@ export class OnboardTenantComponent {
   logoFileId!: number;
 
   detailsFormGroup!: FormGroup;
+
+  captchaResponse!: string;
+  callbackFn: Function | null = null;
 
   constructor(private http: HttpClient, private fb: FormBuilder, private tenantService: TenantService,
     private messageService: ToastMessageService, private spinner: NgxSpinnerService) {
@@ -126,10 +130,10 @@ export class OnboardTenantComponent {
   }
 
   uploadError(event: any) {
-    if(CommonUtil.isNotNullOrEmptyOrUndefined(event.error)){
+    if (CommonUtil.isNotNullOrEmptyOrUndefined(event.error)) {
       this.messageService.showErrorMessage(event.error.error.message, event.error.error.errorCode);
     }
-    else{
+    else {
       this.messageService.showErrorMessage('Error while uploading file');
     }
   }
@@ -138,14 +142,15 @@ export class OnboardTenantComponent {
     return CommonUtil.isNullOrEmptyOrUndefined(this.rangeDates);
   }
 
-  saveTenant() {
+  saveTenant(event: any) {
     this.spinner.show();
+    this.captchaResponse = event;
     let body: any = {
       name: this.detailsFormGroup.controls['name'].value,
       uniqueName: this.detailsFormGroup.controls['uniqueName'].value,
       locale: this.detailsFormGroup.controls['locale'].value,
       timeZone: this.detailsFormGroup.controls['timeZone'].value,
-      logoFileId : this.logoFileId,
+      logoFileId: this.logoFileId,
       tagLine: this.detailsFormGroup.controls['tagLine'].value,
       emailId: this.detailsFormGroup.controls['emailId'].value,
       mobile: this.detailsFormGroup.controls['mobile'].value,
@@ -154,29 +159,42 @@ export class OnboardTenantComponent {
       city: this.detailsFormGroup.controls['city'].value.Name,
       state: this.detailsFormGroup.controls['state'].value,
       pincode: this.detailsFormGroup.controls['pincode'].value,
+      captchaResponse: this.captchaResponse
     };
     this.tenantService.createNewTenant(body)
-        .pipe(
-          switchMap((resp: any) => {
-            body = {
-              startDate: this.rangeDates[0].toLocaleDateString('en-GB'),
-              endDate : this.rangeDates[1].toLocaleDateString('en-GB'),
-            };
-            return this.tenantService.createTenantSubscription(body, resp.data.rootid);
-          })
-        )
-        .subscribe(
-          {
-            next: (resp: any) => {
-              this.messageService.showSuccessMessage('Tenant Onboarded Successfully');
-            },
-            error: (err: any) => {
-              this.messageService.showErrorMessage('Error while onboarding tenant');
-              this.spinner.hide();
-            },
-            complete: () => { this.spinner.hide(); }
-          }
-        );
+      .pipe(
+        switchMap((resp: any) => {
+          body = {
+            startDate: this.rangeDates[0].toLocaleDateString('en-GB'),
+            endDate: this.rangeDates[1].toLocaleDateString('en-GB'),
+          };
+          return this.tenantService.createTenantSubscription(body, resp.data.rootid);
+        })
+      )
+      .subscribe(
+        {
+          next: (resp: any) => {
+            this.messageService.showSuccessMessage('Tenant Onboarded Successfully');
+            this.triggerCallback(4);
+          },
+          error: (err: any) => {
+            this.messageService.showErrorMessage('Error while onboarding tenant');
+            this.spinner.hide();
+          },
+          complete: () => { this.spinner.hide(); }
+        }
+      );
+  }
+
+  setCallback(callback: Function): boolean {
+    this.callbackFn = callback;
+    return true;
+  }
+
+  triggerCallback(stepCount: number) {
+    if (this.callbackFn) {
+      this.callbackFn(stepCount);
     }
+  }
 
 }

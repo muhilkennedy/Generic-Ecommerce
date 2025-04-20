@@ -188,5 +188,6 @@
     "Inactive": "செயலற்றது",
     "Search keyword": "தேடல் விசைச்சொல்",
     "Showing {first} to {last} of {totalRecords} entries": "மொத்தம் {totalRecords} பதிவுகளில் {first} முதல் {last} வரை காட்சிப்படுத்துகிறது",
-    "Employees": "ஊழியர்கள்"
+    "Employees": "ஊழியர்கள்",
+    "Expiring Soon": "மிக விரைவில் காலாவதியாகிறது"
 }

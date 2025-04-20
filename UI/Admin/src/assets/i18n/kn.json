@@ -188,5 +188,6 @@
   "Inactive": "ನಿಷ್ಕ್ರಿಯ",
   "Search keyword": "ಹುಡುಕು ಕೀವರ್ಡ್",
   "Showing {first} to {last} of {totalRecords} entries": "ಒಟ್ಟು {totalRecords} ದಾಖಲೆಗಳಲ್ಲಿ {first} ರಿಂದ {last} ರವರೆಗೆ ತೋರಿಸುತ್ತಿದೆ",
-  "Employees": "ನೌಕರರು"
+  "Employees": "ನೌಕರರು",
+  "Expiring Soon": "ಶೀಘ್ರದಲ್ಲೇ ಮುಗಿಯುತ್ತಿದೆ"
 }

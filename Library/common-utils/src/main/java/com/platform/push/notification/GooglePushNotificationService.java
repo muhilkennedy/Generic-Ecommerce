@@ -1,5 +1,6 @@
 package com.platform.push.notification;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -13,11 +14,11 @@ import com.google.firebase.messaging.WebpushNotification;
 import com.platform.dao.PushNotificationTokenDaoService;
 import com.platform.entity.BaseTenant;
 import com.platform.entity.PushNotificationToken;
+import com.platform.entity.PushNotificationTopic;
 import com.platform.logging.Log;
 import com.platform.model.DirectPushNotification;
 import com.platform.model.PushNotificationSubscriptionRequest;
 import com.platform.model.TopicPushNotification;
-import com.platform.repository.PushNotificationRepository;
 import com.platform.server.BaseSession;
 import com.platform.service.PushNotificationService;
 
@@ -33,6 +34,7 @@ public class GooglePushNotificationService implements PushNotificationService {
 	@Autowired
 	private PushNotificationTokenDaoService daoService;
 
+	@Override
 	public void sendNotificationToTarget(DirectPushNotification notification) {
 		Message message = Message.builder()
 				// Set the configuration for our web notification
@@ -49,6 +51,7 @@ public class GooglePushNotificationService implements PushNotificationService {
 		pushMessageFactory.message().sendAsync(message);
 	}
 
+	@Override
 	public void sendNotificationToTarget(TopicPushNotification notification) {
 		Message message = Message.builder()
 				.setWebpushConfig(WebpushConfig.builder()
@@ -78,8 +81,16 @@ public class GooglePushNotificationService implements PushNotificationService {
 			token.setToken(request.getToken());
 			token.setDeviceinfo(request.getDeviceInfo());
 			token.setUserid(request.getUserid());
-			this.subscribeToTopic(request);
 			daoService.save(token);
+			PushNotificationTopic topic = new PushNotificationTopic();
+			topic.setTopic(request.getTopic());
+			topic.setToken(token);
+			if (token.getTopics() == null) {
+				token.setTopics(new ArrayList<PushNotificationTopic>());
+			}
+			token.getTopics().add(topic);
+			daoService.saveAndFlush(token);
+			this.subscribeToTopic(request);
 		}
 		return token;
 	}
@@ -89,7 +100,7 @@ public class GooglePushNotificationService implements PushNotificationService {
 			throws FirebaseMessagingException {
 		PushNotificationToken token = daoService.findPushNotificationByToken(request.getToken(),
 				request.getUserid());
-		this.unSubscribeFromPushNotification(request);
+		this.unSubscribeFromTopic(request.getTokens(), request.getTopic());
 		daoService.delete(token);
 	}
 
@@ -98,13 +109,15 @@ public class GooglePushNotificationService implements PushNotificationService {
 		List<PushNotificationToken> tokens = daoService.findPushNotificationsForUser(userid);
 		PushNotificationSubscriptionRequest request = new PushNotificationSubscriptionRequest();
 		CollectionUtils.emptyIfNull(tokens).stream().forEach(token -> {
-			request.setTopic(token.getTopic());
-			request.setToken(token.getToken());
-			try {
-				this.unSubscribeFromPushNotification(request);
-			} catch (FirebaseMessagingException e) {
-				Log.platform.error("Exception while unsubscribing push notification : {} : {}", request, e);
-			}
+			token.getTopics().stream().forEach(topic -> {
+				request.setTopic(topic.getTopic());
+				request.setToken(token.getToken());
+				try {
+					this.unSubscribeFromPushNotification(request);
+				} catch (FirebaseMessagingException e) {
+					Log.platform.error("Exception while unsubscribing push notification : {} : {}", request, e);
+				}
+			});
 		});
 	}
 

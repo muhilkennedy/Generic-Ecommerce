@@ -6,7 +6,7 @@
         <div class="card flex flex-col gap-6 w-full">
             <div class="font-semibold text-xl"><b>{{'Onboard New Tenant' | translate}}</b></div>
 
-            <p-stepper [(value)]="activeStep" [linear]="true"> <!-- class="basis-[40rem]" -->
+            <p-stepper [(value)]="activeStep" [linear]="false"> <!-- class="basis-[40rem]" -->
                 <p-step-list>
                     <p-step [value]="1" class="flex flex-row flex-auto gap-2">
                         <ng-template #content let-activateCallback="activateCallback" let-value="value">
@@ -36,7 +36,7 @@
                         </ng-template>
                     </p-step>
 
-                    <p-step [value]="3" class="flex flex-row flex-auto gap-2" [disabled]="true">
+                    <p-step [value]="3" class="flex flex-row flex-auto gap-2">
                         <ng-template #content let-activateCallback="activateCallback" let-value="value">
                             <button class="bg-transparent border-0 inline-flex flex-col gap-2"
                                 (click)="activateCallback()">
@@ -184,6 +184,7 @@
 
                     <p-step-panel [value]="2">
                         <ng-template #content let-activateCallback="activateCallback">
+                            <div *ngIf="setCallback(activateCallback)"><!-- just to utilize acticvateCallBack in ts --></div>
                             <div class="flex flex-col gap-2 mx-auto" >
                                 <div class="text-center mt-4 mb-4 text-xl font-semibold">{{'Upload Tenant Logo' | translate}}</div>
                                 <div class="flex flex-wrap justify-center gap-4">
@@ -221,10 +222,10 @@
                             <div class="flex pt-6 justify-between">
                                 <p-button (onClick)="activateCallback(2)" label="Back" severity="secondary"
                                     icon="pi pi-arrow-left" />
-                                <!-- <p-button (onClick)="activateCallback(4)" [label]="'Next' | translate" icon="pi pi-arrow-right"
-                                    iconPos="right" /> -->
-                                <p-button [disabled]="canSaveTenant()" [label]="'ONBOARD TENANT' | translate" [raised]="true" variant="outlined" severity="success" icon="pi pi-save"
-                                    (onClick)="activateCallback(4); saveTenant()"/>
+                                <app-recaptcha (tokenGenerated)="saveTenant($event)" [disabled]="canSaveTenant()" [iconClass]="'pi pi-save'"
+                                [buttonLabel]="'ONBOARD TENANT' | translate" [raised]="true" variant="outlined" ></app-recaptcha>
+                                <!-- <p-button [disabled]="canSaveTenant()" [label]="'ONBOARD TENANT' | translate" [raised]="true" variant="outlined" severity="success" icon="pi pi-save"
+                                    (onClick)="activateCallback(4); saveTenant()"/> -->
                             </div>
                         </ng-template>
                     </p-step-panel>

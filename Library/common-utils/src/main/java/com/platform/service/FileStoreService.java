@@ -46,4 +46,8 @@ public interface FileStoreService extends BaseService{
 
     String getMediaUrl (Long id) throws FileNotFoundException;
 
+    FileStore moveFile(FileStore fileStore, String targetPath) throws IOException;
+	
+    FileStore moveFile(Long fileStoreId, String targetPath) throws IOException;
+
 }

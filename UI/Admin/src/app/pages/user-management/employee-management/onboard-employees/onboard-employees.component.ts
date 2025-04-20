@@ -13,7 +13,6 @@ import { finalize } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ToastModule } from 'primeng/toast';
 import { FileUploadModule } from 'primeng/fileupload';
-import { MessageService } from 'primeng/api';
 import { DatePicker } from 'primeng/datepicker';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { SpinnerComponent } from '../../../shared/spinner';
@@ -30,12 +29,13 @@ import { ToastMessageService } from '../../../../service/toastmessage/toast-mess
 import { FileUploadComponent } from "../../../shared/file-upload/file-upload.component";
 import { FileStore } from '../../../../model/fileStore';
 import { switchMap } from 'rxjs';
+import { RecaptchaComponent } from '../../../shared/recaptcha/recaptcha.component';
 
 @Component({
   selector: 'app-onboard-employees',
   imports: [InputTextModule, SpinnerComponent, ButtonModule, SelectModule, FormsModule, InputMaskModule, CommonModule, ToastModule, FileUploadModule, RadioButtonModule,
     FluidModule, TextareaModule, ReactiveFormsModule, TranslateModule, FloatLabelModule, StepperModule, DatePicker, NgxSpinnerModule, PasswordModule,
-    AutoCompleteModule, ToggleButtonModule, FileUploadComponent, CardModule],
+    AutoCompleteModule, ToggleButtonModule, FileUploadComponent, CardModule, RecaptchaComponent],
   templateUrl: './onboard-employees.component.html',
   styleUrl: './onboard-employees.component.scss'
 })
@@ -48,12 +48,15 @@ export class OnboardEmployeesComponent {
   filteredEmployees: any[] = [];
 
   proofFileId!: number;
-  profilePicUrl!: string;
+  profilePicId!: number;
   selectedPicFiles: any[] = [];
 
   employee: Employee = new Employee();
 
   roles: Role[] = [];
+
+  captchaToken!: string;
+  callbackFn: Function | null = null;
 
   constructor(private fb: FormBuilder, private employeeService: EmployeeService, private messageService: ToastMessageService, private spinner: NgxSpinnerService) { }
 
@@ -108,7 +111,7 @@ export class OnboardEmployeesComponent {
   }
 
   uploadedPicFileDetails(event: FileStore[]) {
-    this.profilePicUrl = event[0].mediaurl;
+    this.profilePicId = event[0].rootid;
   }
 
   filterEmployees(event: any) {
@@ -144,7 +147,8 @@ export class OnboardEmployeesComponent {
       dob: this.detailsFormGroup.controls['dob'].value.toLocaleDateString('en-GB'),
       gender: this.detailsFormGroup.controls['gender'].value,
       prooffileid: this.proofFileId,
-      profilepicurl: this.profilePicUrl
+      profilepicid: this.profilePicId,
+      captchaResponse: this.captchaToken
     };
     let selectedRoles = this.roles.filter((role: Role) => role.selected).map((role: Role) => role.rootid);
     this.employeeService.onboardEmployee(body).pipe(
@@ -160,6 +164,7 @@ export class OnboardEmployeesComponent {
         next: (resp: any) => {
           this.employee = resp.data;
           this.messageService.showSuccessMessage('Employee Onboarded Successfully');
+          this.triggerCallback(4);
         },
         error: (err: any) => {
           this.messageService.showErrorMessage('Error while onboarding employee');
@@ -168,7 +173,23 @@ export class OnboardEmployeesComponent {
   }
 
   canSaveEmployee() {
-    return CommonUtil.isNullOrEmptyOrUndefined(this.proofFileId) && CommonUtil.isNullOrEmptyOrUndefined(this.profilePicUrl);
+    return CommonUtil.isNullOrEmptyOrUndefined(this.proofFileId) && CommonUtil.isNullOrEmptyOrUndefined(this.profilePicId);
+  }
+
+  onCaptchaResponse(token: any) {
+    this.captchaToken = token;
+    this.saveEmployee();
+  }
+
+  setCallback(callback: Function): boolean {
+    this.callbackFn = callback;
+    return true;
+  }
+
+  triggerCallback(stepCount: number) {
+    if (this.callbackFn) {
+      this.callbackFn(stepCount);
+    }
   }
 
 }

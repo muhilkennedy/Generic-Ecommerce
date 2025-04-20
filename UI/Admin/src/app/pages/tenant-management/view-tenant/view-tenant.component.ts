@@ -47,7 +47,7 @@ export class ViewTenantComponent {
   dialogRef: DynamicDialogRef | undefined;
 
   constructor(private changeDetector: ChangeDetectorRef, private spinner: NgxSpinnerService, public dialogService: DialogService,
-              private messageService: ToastMessageService, private tenantService: TenantService, private translate: TranslateService) { }
+    private messageService: ToastMessageService, private tenantService: TenantService, private translate: TranslateService) { }
 
   ngAfterViewInit() {
     this.changeDetector.detectChanges();
@@ -60,21 +60,21 @@ export class ViewTenantComponent {
         this.spinner.hide();
       })
     )
-    .subscribe({
-      next: (response: any) => {
-        this.tenants = response.dataList;
-        this.spinner.hide();
-      },
-      error: (error: any) => {
-        this.spinner.hide();
-        this.messageService.showErrorMessage('Failed to fetch tenants');
-      }
-    })
+      .subscribe({
+        next: (response: any) => {
+          this.tenants = response.dataList;
+          this.spinner.hide();
+        },
+        error: (error: any) => {
+          this.spinner.hide();
+          this.messageService.showErrorMessage('Failed to fetch tenants');
+        }
+      })
   }
 
   ngOnDestroy() {
     if (this.dialogRef) {
-        this.dialogRef.close();
+      this.dialogRef.close();
     }
   }
 
@@ -85,27 +85,27 @@ export class ViewTenantComponent {
 
   displayDialog(tenant: any) {
     this.dialogRef = this.dialogService.open(ViewTenantDetailsComponent, {
-        header: this.translate.instant('Tenant Details'),
-        width: '50vw',
-        modal: true,
-        contentStyle: { overflow: 'auto' },
-        breakpoints: {
-            '960px': '75vw',
-            '640px': '90vw'
-        },
-        maximizable: true,
-        templates: {
-            footer: DialogFooter
-        },
-        data: tenant
+      header: this.translate.instant('Tenant Details'),
+      width: '50vw',
+      modal: true,
+      contentStyle: { overflow: 'auto' },
+      breakpoints: {
+        '960px': '75vw',
+        '640px': '90vw'
+      },
+      maximizable: true,
+      templates: {
+        footer: DialogFooter
+      },
+      data: tenant
     });
 
     this.dialogRef.onClose.subscribe((data: any) => {
-        //any item selected on dialog
+      //any item selected on dialog
     });
 
     this.dialogRef.onMaximize.subscribe((value) => {
-        //maximize action
+      //maximize action
     });
   }
 
@@ -134,7 +134,8 @@ export class ViewTenantComponent {
   }
 
   getTenantLogoThumbnail(tenant: any): string {
-    return CommonUtil.isNullOrEmptyOrUndefined(tenant.tenantDetail.logoThumbnail) ? '../../../../assets/app/logo_mken_thumbnail.png' : tenant.tenantDetail.logoThumbnail;
+    return (CommonUtil.isNullOrEmptyOrUndefined(tenant.tenantDetail) || CommonUtil.isNullOrEmptyOrUndefined(tenant.tenantDetail.logoThumbnail)) ? 
+            '../../../../assets/app/logo_mken_thumbnail.png' : tenant.tenantDetail.logoThumbnail;
   }
 
   expandAll() {
@@ -152,17 +153,17 @@ export class ViewTenantComponent {
         this.spinner.hide();
       })
     )
-    .subscribe({
-      next: (response: any) => {
-        this.tenantSubscriptions = response.dataList;
-      },
-      error: (error: any) => {
-        this.messageService.showErrorMessage('Failed to fetch tenant subscriptions');
-      },
-      complete: () => {
-        this.spinner.hide();
-      }
-    })
+      .subscribe({
+        next: (response: any) => {
+          this.tenantSubscriptions = response.dataList;
+        },
+        error: (error: any) => {
+          this.messageService.showErrorMessage('Failed to fetch tenant subscriptions');
+        },
+        complete: () => {
+          this.spinner.hide();
+        }
+      })
   }
 
   onRowExpand(event: TableRowExpandEvent) {
@@ -173,11 +174,11 @@ export class ViewTenantComponent {
     //this.messageService.add({ severity: 'success', summary: 'Product Collapsed', detail: event.data.name, life: 3000 });
   }
 
-  saveContact(){
+  saveContact() {
     //TODO
   }
 
-  toggleTenantStatus(){
+  toggleTenantStatus() {
     //TODO
   }
 

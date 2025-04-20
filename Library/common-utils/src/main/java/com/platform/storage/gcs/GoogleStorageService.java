@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.Storage.BlobTargetOption;
 import com.google.cloud.storage.Storage.PredefinedAcl;
 import com.platform.logging.Log;
@@ -42,7 +43,7 @@ public class GoogleStorageService implements StorageService {
 				BlobId bId = (BlobId) blobId.get();
 				Blob blob = factory.storage().get(bId);
 				if (blob != null) {
-					File file = FileUtil.crreateFileinTempDirectory(blob.getName());
+					File file = FileUtil.createFileinTempDirectory(blob.getName());
 					blob.downloadTo(file.toPath());
 					return file;
 				}
@@ -123,6 +124,18 @@ public class GoogleStorageService implements StorageService {
 			Log.platform.info("File deletion status for GCP : {} : {}", blobIdOrFilePath.get(), deleted);
 		}
 		return deleted;
+	}
+
+	@Override
+	public BlobId moveFile(Optional<?> sourceBlobId, String targetPath) {
+		BlobId sourceBlob = (BlobId) sourceBlobId.get();
+		BlobId targetBlob = BlobId.of(factory.bucket(), BaseSession.getTenantUniqueName()
+				.concat(FileUtil.sanitizeDirPath(targetPath)).concat(sourceBlob.getName()));
+		BlobInfo targetBlobInfo = BlobInfo.newBuilder(targetBlob).build();
+		factory.storage().copy(Storage.CopyRequest.of(sourceBlob, targetBlobInfo));
+		// Delete the original file
+		factory.storage().delete(sourceBlob);
+		return targetBlob;
 	}
 
 	private String getBlobName(String url) throws MalformedURLException {

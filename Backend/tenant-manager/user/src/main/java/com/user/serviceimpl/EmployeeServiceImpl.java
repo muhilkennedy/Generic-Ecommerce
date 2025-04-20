@@ -24,10 +24,10 @@ import com.platform.entity.BaseEntity;
 import com.platform.hibernate.search.HibernateSearchService;
 import com.platform.logging.Log;
 import com.platform.model.SearchFilterDTO;
+import com.platform.service.FileStoreService;
 import com.platform.social.LoginTypes;
 import com.platform.util.EncryptionUtil;
 import com.platform.util.SecurityUtil;
-import com.tenant.model.TenantWidgetResponse;
 import com.user.dao.EmployeeDaoService;
 import com.user.dao.UserHashDaoService;
 import com.user.entity.Employee;
@@ -50,6 +50,8 @@ import jakarta.transaction.Transactional;
 @Primary
 public class EmployeeServiceImpl implements EmployeeService {
 	
+	private static final String EMPLOYEE_DIR_PATH = "EMPLOYEE/%s";
+	
 	@Autowired
 	private EmployeeDaoService employeeDaoService;
 	
@@ -61,6 +63,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 	
 	@Autowired
 	private HibernateSearchService hibernateSearch;
+	
+	@Autowired
+	private FileStoreService fileStore;
 	
 	private final List<String> userHashFields = Arrays.asList("email", "mobile");
 
@@ -106,6 +111,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 	
 	@Override
+	@Transactional
 	public Employee createEmployee (EmployeeRequest request) {
 		Employee employee = new Employee();
 		employee.setFname(request.getFname());
@@ -122,8 +128,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 		info.setEmployee(employee);
 		info.setDob(request.getDob());
 		info.setGender(request.getGender());
-		info.setProfilepic(request.getProfilepicurl());
-		info.setProofFileId(request.getProoffileid());
+		try {
+			info.setProfilepic(fileStore
+					.moveFile(request.getProfilepicid(), String.format(EMPLOYEE_DIR_PATH, employee.getUniquename()))
+					.getMediaurl());
+			info.setProofFileId(fileStore
+					.moveFile(request.getProoffileid(), String.format(EMPLOYEE_DIR_PATH, employee.getUniquename()))
+					.getRootid());
+		} catch (IOException e) {
+			Log.user.error("Failed to setup profile picture / employee proof");
+		}
 		employee.setEmployeeInfo(info);
 		return (Employee) employeeDaoService.save(employee);
 	}

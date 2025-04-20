@@ -8,22 +8,29 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import com.platform.entity.BaseEntity;
 import com.platform.entity.PushNotificationToken;
+import com.platform.entity.PushNotificationTopic;
 import com.platform.repository.PushNotificationRepository;
+import com.platform.repository.PushNotificationTopicRepository;
 import com.platform.service.BaseDaoService;
 
 /**
  * @author Muhil
  * TODO: scheduled task to remove token for last 6 months.
  */
+@Service
 public class PushNotificationTokenDaoService implements BaseDaoService {
 	
 	private final String cacheName = "pushNotification";
 	
 	@Autowired
 	private PushNotificationRepository notificationRespository;
+	
+	@Autowired
+	private PushNotificationTopicRepository topicRepository;
 
 	@Override
 	@CachePut(value = cacheName, key = "#obj.rootid")
@@ -67,6 +74,10 @@ public class PushNotificationTokenDaoService implements BaseDaoService {
 
 	public List<PushNotificationToken> findPushNotificationsForUser(Long userId) {
 		return notificationRespository.findPushNotificationTokensForUser(userId);
+	}
+	
+	public PushNotificationTopic saveTopic(PushNotificationTopic topic) {
+		return topicRepository.save(topic);
 	}
 
 }
