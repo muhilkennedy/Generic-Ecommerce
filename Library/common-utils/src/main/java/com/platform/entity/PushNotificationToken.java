@@ -1,9 +1,20 @@
 package com.platform.entity;
 
+import java.util.List;
+
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.platform.annotations.ClassMetaProperty;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 /**
@@ -11,8 +22,10 @@ import jakarta.persistence.Table;
  *
  */
 @Entity
-@Table(name = "PushNotificationToken")
+@Table(name = "PUSHNOTIFICATIONTOKEN")
 @ClassMetaProperty(code = "PNT")
+@Indexed(index = "push_notification_index")
+@NamedEntityGraph(name = "PushNotificationToken.topics", attributeNodes = { @NamedAttributeNode("topics") })
 public class PushNotificationToken extends MultiTenantEntity {
 
 	private static final long serialVersionUID = 1L;
@@ -20,15 +33,17 @@ public class PushNotificationToken extends MultiTenantEntity {
 	@Column(name = "USERID")
 	private Long userid;
 
+	@FullTextField
 	@Column(name = "TOKEN")
 	private String token;
 
 	@Column(name = "DEVICEINFO")
 	private String deviceinfo;
 	
-	@Column(name = "TOPIC")
-	private String topic;
-
+	@JsonIgnore
+	@OneToMany(mappedBy = "token", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	private List<PushNotificationTopic> topics;
+	
 	public Long getUserid() {
 		return userid;
 	}
@@ -53,12 +68,12 @@ public class PushNotificationToken extends MultiTenantEntity {
 		this.deviceinfo = deviceinfo;
 	}
 
-	public String getTopic() {
-		return topic;
+	public List<PushNotificationTopic> getTopics() {
+		return topics;
 	}
 
-	public void setTopic(String topic) {
-		this.topic = topic;
+	public void setTopics(List<PushNotificationTopic> topics) {
+		this.topics = topics;
 	}
-
+	
 }

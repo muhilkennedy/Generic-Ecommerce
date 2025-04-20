@@ -231,13 +231,38 @@ public class FileStoreServiceImpl implements FileStoreService
             if (status)
                 daoService.delete(fs);
         }
-    }
+	}
 
-    @Override
-    public Page<?> findAll (Pageable pageable)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	public FileStore moveFile(FileStore fileStore, String targetPath) throws IOException {
+		Optional<StoreType> type = StoreType.findType(fileStore.getStoretype());
+		FileStore newFileStore = null;
+		switch (type.get()) {
+		case GCS:
+			//TODO check on acl access for below impl
+			/*BlobId blobId = (BlobId) gcsService.moveFile(Optional.of(fileStore.getBlobInfo()), targetPath);
+			fileStore.setBlobInfo(blobId);
+			fileStore.setMediaurl(gcsService.getFileUrl(Optional.of(blobId)));*/
+			// can be optimized instead of reading fileStore object everytime.
+			newFileStore = uploadToFileStore(getFileById(fileStore.getRootid()), fileStore.isAcl(), targetPath);
+			deleteFile(fileStore.getRootid());
+			break;
+		case NFS:
+		default:
+			throw new UnsupportedOperationException();
+		}
+		return newFileStore;
+	}
+
+	@Override
+	public Page<?> findAll(Pageable pageable) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public FileStore moveFile(Long fileStoreId, String targetPath) throws IOException {
+		return moveFile((FileStore) daoService.findById(fileStoreId), targetPath);
+	}
 
 }

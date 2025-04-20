@@ -1,5 +1,7 @@
 package com.tenant.api;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,7 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.platform.annotations.UserPermission;
 import com.platform.annotations.ValidateUserToken;
+import com.platform.exceptions.ReCaptchaException;
 import com.platform.messages.GenericResponse;
+import com.platform.messages.Response;
+import com.platform.recaptcha.ReCaptchaService;
 import com.platform.user.permissions.Permissions;
 import com.tenant.entity.Tenant;
 import com.tenant.entity.TenantSubscription;
@@ -31,13 +36,19 @@ public class AdminTenantController
 
     @Autowired
     private TenantServiceImpl tenantService;
+    
+	@Autowired
+	private ReCaptchaService captchaService;
 
-    @PostMapping
-    @UserPermission(values = { Permissions.SUPER_USER })
-    public GenericResponse<Tenant> createTenant (@RequestBody TenantRequest tenant)
-    {
-        return new GenericResponse<Tenant>(tenantService.createTenant(tenant));
-    }
+	@PostMapping
+	@UserPermission(values = { Permissions.SUPER_USER })
+	public GenericResponse<Tenant> createTenant(@RequestBody TenantRequest tenant) throws ReCaptchaException {
+		if (!captchaService.verify(tenant.getCaptchaResponse())) {
+			return new GenericResponse<Tenant>().setStatus(Response.Status.FORBIDDEN)
+					.setErrorList(List.of("ReCaptcha Validation Failed!")).build();
+		}
+		return new GenericResponse<Tenant>(tenantService.createTenant(tenant));
+	}
     
     @GetMapping("/all")
     @UserPermission(values = { Permissions.SUPER_USER })

@@ -20,8 +20,9 @@ public class EmployeeRequest {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
 	private Date dob;
 	private Long prooffileid;
-	private String profilepicurl;
+	private Long profilepicid;
 	private String gender;
+	private String captchaResponse;
 
 	public String getFname() {
 		return fname;
@@ -103,12 +104,12 @@ public class EmployeeRequest {
 		this.prooffileid = prooffileid;
 	}
 
-	public String getProfilepicurl() {
-		return profilepicurl;
+	public Long getProfilepicid() {
+		return profilepicid;
 	}
 
-	public void setProfilepicurl(String profilepicurl) {
-		this.profilepicurl = profilepicurl;
+	public void setProfilepicid(Long profilepicid) {
+		this.profilepicid = profilepicid;
 	}
 
 	public String getGender() {
@@ -117,6 +118,14 @@ public class EmployeeRequest {
 
 	public void setGender(String gender) {
 		this.gender = gender;
+	}
+
+	public String getCaptchaResponse() {
+		return captchaResponse;
+	}
+
+	public void setCaptchaResponse(String captchaResponse) {
+		this.captchaResponse = captchaResponse;
 	}
 
 }

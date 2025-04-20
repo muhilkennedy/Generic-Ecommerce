@@ -6,6 +6,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 import com.platform.annotations.ClassMetaProperty;
 import com.platform.entity.BaseEntity;
+import com.platform.entity.BaseTenant;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -25,7 +26,7 @@ import jakarta.persistence.Table;
 @ClassMetaProperty(code = "REALM")
 @Indexed(index = "tenant_index")
 @NamedEntityGraph(name = "Tenant.detail", attributeNodes = { @NamedAttributeNode("tenantDetail") })
-public class Tenant extends BaseEntity implements Serializable {
+public class Tenant extends BaseEntity implements Serializable, BaseTenant {
 
 	private static final long serialVersionUID = 1L;
 

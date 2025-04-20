@@ -1,0 +1,15 @@
+<!-- <div *ngIf="scriptLoaded">
+     @if (visible) {
+          <div id="recaptcha" class="g-recaptcha" ng-model="g-recaptcha-response" data-callback="onRecaptchaSuccess"
+          style="transform:scale(0.72);transform-origin:0 0" [attr.data-sitekey]="recaptchaSiteKey">
+          </div>
+     }
+     @else{
+          <div id="recaptcha-container" class="g-recaptcha" ng-model="g-recaptcha-response" data-callback="onRecaptchaSuccess"
+          [attr.data-sitekey]="recaptchaSiteKey" [attr.data-size]="'invisible'">
+          </div>
+     }
+</div> -->
+<div #recaptchaContainer id="invisible-recaptcha"></div>
+<!-- <button #captchaButton (click)="debugExecute()">Run reCAPTCHA</button> -->
+<p-button [disabled]="disabled" [label]="buttonLabel" [raised]="raised" [variant]="variant" [severity]="severity" [icon]="iconClass" (onClick)="execute()"/>

@@ -23,9 +23,10 @@ export class PushNotificationService {
         getToken(this.messaging, {
           vapidKey: environment.firebase.vapidKey
         }).then((token) => {
-          console.log('FCM Token:', token);
+          //console.log('FCM Token:', token);
           localStorage.setItem(CommonUtil.KEY_FCM_TOKEN, token);
           this.subscribeToEmployeeTopic();
+          this.listenForMessages();
         }).catch((err) => {
           console.error('Error getting token:', err);
           this.toastMessage.showErrorMessage('Push Notification configuration failed! You can enable it in your browser settings.');
@@ -56,7 +57,7 @@ export class PushNotificationService {
       userid: this.userData.employee.rootid
     }).subscribe({
       next: (response: any) => {
-        console.log('Subscribed to topic:', response);
+        //console.log('Subscribed to topic:', response);
       },
       error: (error) => {
         console.error('Error subscribing to topic:', error);

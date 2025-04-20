@@ -59,4 +59,14 @@ public class GenericResponse<T> extends Response {
 	public GenericResponse<T> build() {
 		return this;
 	}
+	
+	public GenericResponse<T> setErrorList(List<String> errorList) {
+		setErrorMessages(errorList);
+		return this;
+	} 
+	
+	public GenericResponse<T> setWarningList(List<String> warnList) {
+		setWarningList(warnList);
+		return this;
+	} 
 }

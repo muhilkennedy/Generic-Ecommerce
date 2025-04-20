@@ -1,5 +1,6 @@
 package com.tenant.serviceimpl;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Calendar;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import com.platform.entity.BaseEntity;
+import com.platform.entity.FileStore;
+import com.platform.logging.Log;
 import com.platform.server.BaseSession;
 import com.platform.service.EmailService;
 import com.platform.service.FileStoreService;
@@ -38,6 +41,8 @@ import com.tenant.service.TenantService;
 @Qualifier("TenantService")
 @Primary
 public class TenantServiceImpl implements TenantService {
+	
+	private static String LOGO_DIR = "LOGO";
 	
 	@Autowired
 	private TenantDaoService daoService;
@@ -85,10 +90,18 @@ public class TenantServiceImpl implements TenantService {
            Assert.state(false, e.getMessage());
         }
 		daoService.saveAndFlush(tenant);
-		BaseSession.setTenant(tenant);//reset tenant info before persisting tenant related objects
+		//Update tenant info before persisting tenant related objects
+		BaseSession.setTenant(tenant);
+		BaseSession.SetTenantUniqueName(tenant.getUniqueName());
 		UpdateTenantDetails(tenantRequest);
+		// Move Logo to respective tenant folder, as previous logo would have been uploded into admin realm.
+		try {
+			tenant.setLogo(fileStore.moveFile(tenantRequest.getLogoFileId(), LOGO_DIR).getMediaurl());
+		} catch (IOException e) {
+			Log.tenant.error("Failed to move tenant logo from admin realm.", e);
+		}
 		//send onboarding email
-		return tenant;
+		return (Tenant) daoService.saveAndFlush(tenant);
 	}
 
 	@Override
@@ -103,12 +116,11 @@ public class TenantServiceImpl implements TenantService {
 		details.setTagline(tenantRequest.getTagLine());
 		details.setState(tenantRequest.getState());
         try {
-            details.setLogothumbnail(
-                fileStore.uploadToFileStore(
-                    ImageUtil.getPNGThumbnailImage(
-                        fileStore.getFileById(tenantRequest.getLogoFileId()),
-                        false),
-                    false).getMediaurl());
+			details.setLogothumbnail(
+					fileStore
+							.uploadToFileStore(ImageUtil.getPNGThumbnailImage(
+									fileStore.getFileById(tenantRequest.getLogoFileId()), false), false, LOGO_DIR)
+							.getMediaurl());
         }
         catch (IOException e) {
             Assert.state(false, e.getMessage());
@@ -116,7 +128,6 @@ public class TenantServiceImpl implements TenantService {
 		Tenant tenant = (Tenant) BaseSession.getTenant();
 		tenant.setTenantDetail(details);
 		details.setTenant(tenant);
-		daoService.saveAndFlush(tenant);
 		return details;
 	}
 	

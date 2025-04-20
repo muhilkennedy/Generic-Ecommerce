@@ -15,14 +15,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.AgeFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.checkerframework.common.returnsreceiver.qual.This;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.platform.entity.BaseEntity;
 import com.platform.logging.Log;
 import com.platform.server.BaseSession;
 
@@ -121,7 +117,7 @@ public class FileUtil {
 		return ROOT_TEMP_DIRECTORY + File.separator + BaseSession.getTenantUniqueName();
 	}
 
-	public static File crreateFileinTempDirectory(String fileNamewithExtension) {
+	public static File createFileinTempDirectory(String fileNamewithExtension) {
 		return new File(FileUtil.getTempDirectory() + getFileName(fileNamewithExtension)
 				+ getFileExtension(fileNamewithExtension));
 	}

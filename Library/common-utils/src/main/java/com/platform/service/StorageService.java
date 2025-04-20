@@ -25,6 +25,10 @@ public interface StorageService {
 	default String getFileUrl(Optional<?> blobIdOrFilePath) {
 		return null;
 	}
+	
+	default Object moveFile(Optional<?> sourceBlobId, String targetPath) {
+		return null;
+	}
 
 	default void updateTenantConfig(Long tenantId, String gcpConfig, String gcpBucket) throws IOException {
 		// NO-OP

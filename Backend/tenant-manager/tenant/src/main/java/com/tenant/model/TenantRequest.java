@@ -20,6 +20,7 @@ public class TenantRequest {
 	private String city;
 	private String state;
 	private String pincode;
+	private String captchaResponse;
 
 	public String getName() {
 		return name;
@@ -136,5 +137,13 @@ public class TenantRequest {
     {
         this.state = state;
     }
+
+	public String getCaptchaResponse() {
+		return captchaResponse;
+	}
+
+	public void setCaptchaResponse(String captchaResponse) {
+		this.captchaResponse = captchaResponse;
+	}
 
 }

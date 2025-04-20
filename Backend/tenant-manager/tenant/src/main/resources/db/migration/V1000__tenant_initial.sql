@@ -69,14 +69,14 @@ CREATE TABLE IF NOT EXISTS googleconfig (
 
 /* Initial data load */
 /* INSERT INTO tenant (rootid, name, uniquename) VALUES (0, 'MKEN SYSTEM', 'SYSTEM'); */
-INSERT INTO tenant (rootid, name, uniquename) VALUES 
-    (-1, 'Admin Tenant (dev)', 'devTenant'),
-    (-2, 'Client Dev Tenant (dev)', 'clientDevTenant');
+INSERT INTO tenant (rootid, name, uniquename, logo) VALUES 
+    (-1, 'Admin Tenant (dev)', 'devTenant', 'https://firebasestorage.googleapis.com/v0/b/mken-test-webapp.appspot.com/o/SYSTEM%2Ffavicon.ico?alt=media'),
+    (-2, 'Client Dev Tenant (dev)', 'clientDevTenant', 'https://firebasestorage.googleapis.com/v0/b/mken-test-webapp.appspot.com/o/SYSTEM%2Ffavicon.ico?alt=media');
 
 /* dev email - noreplyeventemail@gmail.com */
-INSERT INTO tenantdetails (rootid, tenantid, contact, emailid, street, city, pincode, tagline, businessemail) VALUES 
-    (-1, -1, '1234567890', 'noreplyeventemail@gmail.com', 'street', 'mpm', '603104', 'Vazhka oru vattam da!', ''),
-    (-2, -2, '1234567890', 'noreplyeventemail@gmail.com', 'street', 'mpm', '603104', 'Vazhka oru vattam da!', '');
+INSERT INTO tenantdetails (rootid, tenantid, contact, emailid, street, city, pincode, tagline, businessemail, logothumbnail) VALUES 
+    (-1, -1, '1234567890', 'noreplyeventemail@gmail.com', 'street', 'mpm', '603104', 'Vazhka oru vattam da!', '', 'https://firebasestorage.googleapis.com/v0/b/mken-test-webapp.appspot.com/o/SYSTEM%2Ffavicon.ico?alt=media'),
+    (-2, -2, '1234567890', 'noreplyeventemail@gmail.com', 'street', 'mpm', '603104', 'Vazhka oru vattam da!', '', 'https://firebasestorage.googleapis.com/v0/b/mken-test-webapp.appspot.com/o/SYSTEM%2Ffavicon.ico?alt=media');
 
 INSERT INTO tenantsubscription (rootid, tenantid, active, timecreated, timeupdated, startdate, enddate) VALUES 
     (-1, -1, TRUE, 1, 1, '2023-01-23', '2050-01-23');
